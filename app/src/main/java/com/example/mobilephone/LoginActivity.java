@@ -27,7 +27,7 @@ import okhttp3.Response;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity /*implements LoaderCallbacks<Cursor>*/ {
+public class LoginActivity extends AppCompatActivity {
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -63,6 +63,15 @@ public class LoginActivity extends AppCompatActivity /*implements LoaderCallback
             @Override
             public void onClick(View view) {
                 attemptLogin();
+            }
+        });
+
+        TextView mCreateAccount = (TextView) findViewById(R.id.create_account);
+        mCreateAccount.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent registerAccountActivity = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(registerAccountActivity);
             }
         });
 
@@ -172,20 +181,15 @@ public class LoginActivity extends AppCompatActivity /*implements LoaderCallback
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
             int status;
 
             try {
-                // Simulate network access.
                 status = authenticateUser();
             } catch (IOException e) {
                 return false;
             }
 
             return status == 200;
-
-            // TODO: register the new account here.
-            //return true;
         }
 
         @Override
@@ -216,6 +220,7 @@ public class LoginActivity extends AppCompatActivity /*implements LoaderCallback
             Request request = new Request.Builder()
                     .url(webEndpoint + mUsername + "/")
                     .addHeader("Authorization", credentials)
+                    .addHeader("cache-control", "no-cache")
                     .build();
             try(Response response = client.newCall(request).execute()) {
                 return response.code();

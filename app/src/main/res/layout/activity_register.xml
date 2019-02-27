@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <EditText
+        android:id="@+id/new_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/Password"
+        android:inputType="textPassword"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/new_username"
+        app:layout_constraintStart_toStartOf="@+id/new_username"
+        app:layout_constraintTop_toBottomOf="@+id/new_username"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/new_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:hint="@string/Username"
+        android:inputType="textPersonName"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:importantForAutofill="no" />
+
+    <Button
+        android:id="@+id/create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/create"
+        app:layout_constraintEnd_toEndOf="@+id/s_goal"
+        app:layout_constraintStart_toStartOf="@+id/s_goal"
+        app:layout_constraintTop_toBottomOf="@+id/s_goal" />
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/Email"
+        android:importantForAutofill="no"
+        android:inputType="textWebEmailAddress"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/new_password"
+        app:layout_constraintStart_toStartOf="@+id/new_password"
+        app:layout_constraintTop_toBottomOf="@+id/new_password" />
+
+    <EditText
+        android:id="@+id/lfootsize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/left_foot_size"
+        android:inputType="number"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/email"
+        app:layout_constraintStart_toStartOf="@+id/email"
+        app:layout_constraintTop_toBottomOf="@+id/email"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/rfootsize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/right_foot_size"
+        android:inputType="number"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/lfootsize"
+        app:layout_constraintStart_toStartOf="@+id/lfootsize"
+        app:layout_constraintTop_toBottomOf="@+id/lfootsize"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/f_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/first_name"
+        android:inputType="textPersonName"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/rfootsize"
+        app:layout_constraintStart_toStartOf="@+id/rfootsize"
+        app:layout_constraintTop_toBottomOf="@+id/rfootsize"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/l_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/last_name"
+        android:inputType="textPersonName"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/f_name"
+        app:layout_constraintStart_toStartOf="@+id/f_name"
+        app:layout_constraintTop_toBottomOf="@+id/f_name"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/height_in"
+        android:inputType="number"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/l_name"
+        app:layout_constraintStart_toStartOf="@+id/l_name"
+        app:layout_constraintTop_toBottomOf="@+id/l_name"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/weight_lbs"
+        android:inputType="number"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/height"
+        app:layout_constraintStart_toStartOf="@+id/height"
+        app:layout_constraintTop_toBottomOf="@+id/height"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/s_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/step_goal"
+        android:inputType="number"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/weight"
+        app:layout_constraintStart_toStartOf="@+id/weight"
+        app:layout_constraintTop_toBottomOf="@+id/weight"
+        android:importantForAutofill="no" />
+
+</android.support.constraint.ConstraintLayout>

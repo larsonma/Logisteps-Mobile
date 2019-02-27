@@ -19,4 +19,22 @@
     <string name="action_create_account">Create Account</string>
     <string name="logisteps_logo">Logisteps Logo</string>
     <string name="title_activity_login2">Sign in</string>
+    <string name="Password">Password</string>
+    <string name="Username">Username</string>
+    <string name="Email">Email</string>
+    <string name="left_foot_size">Left Foot Size</string>
+    <string name="right_foot_size">Right Foot Size</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="height_in">Height (inches)</string>
+    <string name="weight_lbs">Weight (lbs)</string>
+    <string name="step_goal">Step Goal</string>
+    <string name="create">Create</string>
+    <string name="error_shoe_size">Invalid Shoe Size</string>
+    <string name="error_first_name">Invalid First Name</string>
+    <string name="error_last_name">Invalid Last Name</string>
+    <string name="error_height">Invalid Height</string>
+    <string name="error_weight">Invalid Weight</string>
+    <string name="error_step_goal">Invalid Step Goal</string>
+    <string name="error_user_taken">Username already taken</string>
 </resources>
