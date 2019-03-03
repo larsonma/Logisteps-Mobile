@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -198,6 +199,7 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
+                saveCredentials();
                 finish();
                 Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
                 LoginActivity.this.startActivity(mainActivityIntent);
@@ -205,6 +207,14 @@ public class LoginActivity extends AppCompatActivity {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
+        }
+
+        private void saveCredentials() {
+            SharedPreferences sp=getSharedPreferences("Login", MODE_PRIVATE);
+            SharedPreferences.Editor Ed=sp.edit();
+            Ed.putString("Username",mUsername );
+            Ed.putString("Password",mPassword);
+            Ed.commit();
         }
 
         @Override
