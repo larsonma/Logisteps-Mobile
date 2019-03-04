@@ -28,7 +28,6 @@
     <string name="last_name">Last Name</string>
     <string name="height_in">Height (inches)</string>
     <string name="weight_lbs">Weight (lbs)</string>
-    <string name="step_goal">Step Goal</string>
     <string name="create">Create</string>
     <string name="error_shoe_size">Invalid Shoe Size</string>
     <string name="error_first_name">Invalid First Name</string>
@@ -37,4 +36,14 @@
     <string name="error_weight">Invalid Weight</string>
     <string name="error_step_goal">Invalid Step Goal</string>
     <string name="error_user_taken">Username already taken</string>
+    <string name="account">Account</string>
+    <string name="step_goal">Step Goal</string>
+    <string name="steps_per_hr">Steps/Hr.</string>
+    <string name="steps_projected">Projected Steps</string>
+    <string name="shoe_left">Left Shoe</string>
+    <string name="shoe_right">Right Shoe</string>
+    <string name="status">Status:</string>
+    <string name="connect">Connect</string>
+    <string name="default_num">--</string>
+    <string name="disconnected">disconnected</string>
 </resources>
