@@ -69,10 +69,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        setUserCredentials();
-        viewModel.getStepSummary().observe(this, stepSummary -> {
-            // TODO: update UI
-        });
+//        setUserCredentials();
+//        viewModel.getStepSummary().observe(this, stepSummary -> {
+//            // TODO: update UI
+//        });
     }
 
     private void setUserCredentials() {

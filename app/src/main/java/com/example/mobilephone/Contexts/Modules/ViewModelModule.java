@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.mobilephone.Contexts.keys.ViewModelKey;
 import com.example.mobilephone.ViewModels.FactoryViewModel;
 import com.example.mobilephone.ViewModels.StepSummaryViewModel;
+import com.example.mobilephone.ViewModels.UserViewModel;
 
 import dagger.Binds;
 import dagger.Module;
@@ -17,6 +18,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(StepSummaryViewModel.class)
     abstract ViewModel bindStepSummaryViewModel(StepSummaryViewModel stepSummaryViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(UserViewModel.class)
+    abstract ViewModel bindUserViewModel (UserViewModel userViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(FactoryViewModel factory);

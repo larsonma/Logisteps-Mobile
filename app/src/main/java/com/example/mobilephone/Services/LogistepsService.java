@@ -14,7 +14,7 @@ public interface LogistepsService {
     @GET("user/{user}/")
     Call<User> getUser(@Path("user") String username, @Header("Authorization") String credentials);
 
-    @POST("/user/")
+    @POST("user/")
     Call<User> postUser(@Body User user);
 
     @GET("steps/summary/")

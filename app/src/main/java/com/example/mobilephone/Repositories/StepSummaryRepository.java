@@ -48,7 +48,7 @@ public class StepSummaryRepository {
             if (stepSummaryExists == null) {
                 //Refreshes the data.
                 try {
-                    Response<StepSummary> response = webservice.getStepSummary(Credentials.basic(user.getUsername(), user.getPassword())).execute();
+                    Response<StepSummary> response = webservice.getStepSummary(Credentials.basic(user.getBaseUser().getUsername(), user.getBaseUser().getPassword())).execute();
                     stepSummaryDao.save(response.body());
                 } catch (IOException e) {
                     //TODO: Check for errors

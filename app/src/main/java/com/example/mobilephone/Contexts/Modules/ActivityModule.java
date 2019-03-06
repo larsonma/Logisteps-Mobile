@@ -5,10 +5,12 @@ import com.example.mobilephone.Activities.MainActivity;
 import com.example.mobilephone.Activities.RegisterActivity;
 
 import dagger.Module;
+import dagger.android.ContributesAndroidInjector;
 
 @Module
 public abstract class ActivityModule {
     abstract MainActivity contributeMainActivity();
     abstract LoginActivity contributeLoginActivity();
+    @ContributesAndroidInjector
     abstract RegisterActivity contributeRegisterActivity();
 }

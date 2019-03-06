@@ -1,5 +1,9 @@
 package com.example.mobilephone.Models;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.util.Date;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -7,19 +11,45 @@ import androidx.room.PrimaryKey;
 public class User {
 
     @PrimaryKey
+    @SerializedName("id")
     private int id;
-    private String username;
-    private String password;
-    private String email;
-    private String firstName;
-    private String lastName;
 
+    @SerializedName("user")
+    private BaseUser baseUser;
+
+    @SerializedName("left_shoe")
     private Shoe leftShoe;
+
+    @SerializedName("right_shoe")
     private Shoe rightShoe;
 
+    @SerializedName("height")
     private int height;
+
+    @SerializedName("weight")
     private int weight;
+
+    @SerializedName("step_goal")
     private int stepGoal;
+
+    private Date lastRefresh;
+
+    public User(BaseUser baseUser, Shoe leftShoe, Shoe rightShoe, int height, int weight, int stepGoal) {
+        this.baseUser = baseUser;
+        this.leftShoe = leftShoe;
+        this.rightShoe = rightShoe;
+        this.height = height;
+        this.weight = weight;
+        this.stepGoal = stepGoal;
+    }
+
+    public Date getLastRefresh() {
+        return lastRefresh;
+    }
+
+    public void setLastRefresh(Date lastRefresh) {
+        this.lastRefresh = lastRefresh;
+    }
 
     public int getId() {
         return id;
@@ -29,44 +59,12 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public BaseUser getBaseUser() {
+        return this.baseUser;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setBaseUser(BaseUser user) {
+        this.baseUser = user;
     }
 
     public Shoe getLeftShoe() {

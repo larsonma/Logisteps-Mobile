@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
+import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
@@ -14,8 +15,7 @@ public class StepSummary {
     @PrimaryKey
     @NonNull
     @Expose
-    @SerializedName("id")
-    private int id;
+    private String id;
 
     @SerializedName("steps")
     @Expose
@@ -47,10 +47,10 @@ public class StepSummary {
 
     private Date lastRefresh;
 
-    public StepSummary(int id, int steps, int goal, float percent, HourActivity leastActiveHour,
+    public StepSummary(int steps, int goal, float percent, HourActivity leastActiveHour,
                        HourActivity mostActiveHour, ActivityTime inactiveTime, double stepsPerHour,
                        Date lastRefresh) {
-        this.id = id;
+        this.id = UUID.randomUUID().toString();
         this.steps = steps;
         this.goal = goal;
         this.percent = percent;
@@ -61,11 +61,11 @@ public class StepSummary {
         this.lastRefresh = lastRefresh;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

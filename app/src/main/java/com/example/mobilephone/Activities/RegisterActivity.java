@@ -1,8 +1,6 @@
 package com.example.mobilephone.Activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -10,19 +8,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.mobilephone.Models.BaseUser;
+import com.example.mobilephone.Models.Shoe;
+import com.example.mobilephone.Models.User;
 import com.example.mobilephone.R;
+import com.example.mobilephone.ViewModels.UserViewModel;
 
-import java.io.IOException;
+import javax.inject.Inject;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import dagger.android.AndroidInjection;
 
 public class RegisterActivity extends AppCompatActivity {
-
-    private UserRegisterTask mRegisterTask = null;
 
     // UI reference
     private EditText mUsername;
@@ -36,6 +34,10 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mWeight;
     private EditText mStepGoal;
     private Button mCreate;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+    private UserViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +62,20 @@ public class RegisterActivity extends AppCompatActivity {
                 attempRegister();
             }
         });
+
+        this.configureDagger();
+        this.configureViewModel();
+    }
+
+    private void configureDagger() {
+        AndroidInjection.inject(this);
+    }
+
+    private void configureViewModel() {
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(UserViewModel.class);
     }
 
     private void attempRegister() {
-        if (mRegisterTask != null) {
-            return;
-        }
-
         // Reset errors.
         mUsername.setError(null);
         mPassword.setError(null);
@@ -165,113 +174,21 @@ public class RegisterActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            mRegisterTask = new UserRegisterTask(username, password, email, lFootSize, rFootSize,
-                    firstName, lastName, height, weight, stepGoal);
-            mRegisterTask.execute((Void) null);
+            Shoe leftShoe = new Shoe("L", lFootSize);
+            Shoe rightShoe = new Shoe("R", rFootSize);
+            BaseUser baseUser = new BaseUser(username, password, email, firstName, lastName);
+            User user = new User(baseUser, leftShoe, rightShoe, height, weight, stepGoal);
+            viewModel.createUser(user, integer -> {
+                if(integer == 201) {
+                    finish();
+                    Intent mainActivityIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                    RegisterActivity.this.startActivity(mainActivityIntent);
+                } else {
+                    RegisterActivity.this.mUsername.setError(getString(R.string.error_user_taken));
+                    RegisterActivity.this.mUsername.requestFocus();
+                }
+            });
         }
     }
 
-    public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mUsername;
-        private final String mPassword;
-        private final String mEmail;
-        private final float mLeftFootSize;
-        private final float mRightFootSize;
-        private final String mFirstName;
-        private final String mLastName;
-        private final int mHeight;
-        private final int mWeight;
-        private final int mStepGoal;
-
-        private static final String webEndpoint = "http://10.0.2.2:8000/api/user/";
-
-        UserRegisterTask(String username, String password, String email, float lFootSize, float rFootSize,
-                         String firstName, String lastName, int height, int weight, int goal) {
-            mUsername = username;
-            mPassword = password;
-            mEmail = email;
-            mLeftFootSize = lFootSize;
-            mRightFootSize = rFootSize;
-            mFirstName = firstName;
-            mLastName = lastName;
-            mHeight = height;
-            mWeight = weight;
-            mStepGoal = goal;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            int status;
-
-            try {
-                status = registerUser();
-            } catch (IOException e) {
-                return false;
-            }
-
-            return status == 201;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mRegisterTask = null;
-
-            if (success) {
-                saveCredentials();
-                finish();
-                Intent mainActivityIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                RegisterActivity.this.startActivity(mainActivityIntent);
-            } else {
-                RegisterActivity.this.mUsername.setError(getString(R.string.error_user_taken));
-                RegisterActivity.this.mUsername.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mRegisterTask = null;
-        }
-
-        private void saveCredentials() {
-            SharedPreferences sp=getSharedPreferences("Login", MODE_PRIVATE);
-            SharedPreferences.Editor Ed=sp.edit();
-            Ed.putString("Username",mUsername );
-            Ed.putString("Password",mPassword);
-            Ed.commit();
-        }
-
-        private int registerUser() throws IOException {
-            OkHttpClient client = new OkHttpClient();
-
-            MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(mediaType,
-                    "{\"user\":{" +
-                            "\"username\":\"" + mUsername + "\"," +
-                            "\"email\":\"" + mEmail + "\"," +
-                            "\"first_name\":\"" + mFirstName + "\"," +
-                            "\"last_name\":\"" + mLastName +"\"," +
-                            "\"password\":\"" + mPassword + "\"}," +
-                            "\"right_shoe\":{" +
-                            "\"foot\":\"R\"," +
-                            "\"size\":" + mRightFootSize + "}," +
-                            "\"left_shoe\":{" +
-                            "\"foot\":\"L\"," +
-                            "\"size\":" + mLeftFootSize + "}," +
-                            "\"height\":" + mHeight + "," +
-                            "\"weight\":" + mWeight + "," +
-                            "\"step_goal\":" + mStepGoal + "}");
-
-            Request request = new Request.Builder()
-                    .url(webEndpoint)
-                    .post(body)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("cache-control", "no-cache")
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-                return response.code();
-            }
-        }
-    }
 }

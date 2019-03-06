@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.example.mobilephone.Databases.StepSummaryDao;
 import com.example.mobilephone.Databases.StepSummaryDatabase;
+import com.example.mobilephone.Databases.UserDao;
+import com.example.mobilephone.Databases.UserDatabase;
 import com.example.mobilephone.Services.LogistepsService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,6 +18,8 @@ import javax.inject.Singleton;
 import androidx.room.Room;
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -24,8 +28,15 @@ public class AppModule {
     //Databases
     @Provides
     @Singleton
-    StepSummaryDatabase provideDatabase(Application application) {
+    StepSummaryDatabase provideSummaryDatabase(Application application) {
         return Room.databaseBuilder(application, StepSummaryDatabase.class, "StepSummary.db")
+                .build();
+    }
+
+    @Provides
+    @Singleton
+    UserDatabase provideUserDatabase(Application application) {
+        return Room.databaseBuilder(application, UserDatabase.class, "User.db")
                 .build();
     }
 
@@ -35,6 +46,12 @@ public class AppModule {
         return database.stepSummaryDao();
     }
 
+    @Provides
+    @Singleton
+    UserDao provideUserDao(UserDatabase database) {
+        return database.userDao();
+    }
+
     //Repositories
     @Provides
     Executor provideExecutor() {
@@ -42,7 +59,7 @@ public class AppModule {
     }
 
     //API
-    private static String BASE_URL = "http://127.0.0.1:8000/api/";
+    private static String BASE_URL = "http://10.0.2.2:8000/api/";
 
     @Provides
     Gson provideGson() {
@@ -54,6 +71,7 @@ public class AppModule {
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .baseUrl(BASE_URL)
+                .client(createHttpDebuggerClient())
                 .build();
         return retrofit;
     }
@@ -62,5 +80,12 @@ public class AppModule {
     @Singleton
     LogistepsService provideApiWebservice(Retrofit restAdapter) {
         return restAdapter.create(LogistepsService.class);
+    }
+
+    private OkHttpClient createHttpDebuggerClient() {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        return client;
     }
 }
