@@ -8,9 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.mobilephone.Models.BaseUser;
-import com.example.mobilephone.Models.Shoe;
-import com.example.mobilephone.Models.User;
 import com.example.mobilephone.R;
 import com.example.mobilephone.ViewModels.UserViewModel;
 
@@ -174,21 +171,22 @@ public class RegisterActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            Shoe leftShoe = new Shoe("L", lFootSize);
-            Shoe rightShoe = new Shoe("R", rFootSize);
-            BaseUser baseUser = new BaseUser(username, password, email, firstName, lastName);
-            User user = new User(baseUser, leftShoe, rightShoe, height, weight, stepGoal);
-            viewModel.createUser(user, integer -> {
-                if(integer == 201) {
-                    finish();
-                    Intent mainActivityIntent = new Intent(RegisterActivity.this, MainActivity.class);
-                    RegisterActivity.this.startActivity(mainActivityIntent);
+            viewModel.createUser(username, password, email, firstName, lastName, lFootSize, rFootSize,
+                    height, weight, stepGoal, status -> {
+                if(status == 201) {
+                    startMainIntent();
                 } else {
                     RegisterActivity.this.mUsername.setError(getString(R.string.error_user_taken));
                     RegisterActivity.this.mUsername.requestFocus();
                 }
             });
         }
+    }
+
+    private void startMainIntent() {
+        finish();
+        Intent mainActivityIntent = new Intent(RegisterActivity.this, MainActivity.class);
+        RegisterActivity.this.startActivity(mainActivityIntent);
     }
 
 }

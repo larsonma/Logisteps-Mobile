@@ -1,5 +1,7 @@
 package com.example.mobilephone.ViewModels;
 
+import com.example.mobilephone.Models.BaseUser;
+import com.example.mobilephone.Models.Shoe;
 import com.example.mobilephone.Models.User;
 import com.example.mobilephone.Repositories.UserRepository;
 
@@ -26,7 +28,14 @@ public class UserViewModel extends ViewModel {
         this.user = userRepository.getUser(user);
     }
 
-    public void createUser(User user, Consumer<Integer> consumer) {
+    public void createUser(String username, String password, String email, String firstName,
+            String lastName, float lFootSize, float rFootSize, int height, int weight,
+            int stepGoal, Consumer<Integer> consumer) {
+        Shoe leftFoot = new Shoe("L", lFootSize);
+        Shoe rightFoot = new Shoe("R", rFootSize);
+        BaseUser baseUser = new BaseUser(username, password, email, firstName, lastName);
+        User user = new User(baseUser, leftFoot, rightFoot, height, weight, stepGoal);
+
         userRepository.createUser(user, consumer);
     }
 

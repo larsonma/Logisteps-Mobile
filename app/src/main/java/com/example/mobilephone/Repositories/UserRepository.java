@@ -61,15 +61,6 @@ public class UserRepository {
                 }
             }
         });
-//        executor.execute(() -> {
-//            try {
-//                Response<User> response = webservice.postUser(user).execute();
-//                userDao.save(user);
-//            } catch (IOException e) {
-//                // TODO: check for errors
-//                Log.e(TAG, e.toString());
-//            }
-//        });
     }
 
     private void refreshUser(final User user) {
