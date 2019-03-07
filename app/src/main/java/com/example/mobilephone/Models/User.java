@@ -4,17 +4,19 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity
 public class User {
 
-    @PrimaryKey
     @SerializedName("id")
+    @PrimaryKey
     private int id;
 
     @SerializedName("user")
+    @Embedded(prefix = "usr_")
     private BaseUser baseUser;
 
     @SerializedName("left_shoe")

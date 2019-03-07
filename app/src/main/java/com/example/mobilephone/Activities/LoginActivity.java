@@ -4,44 +4,38 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.mobilephone.R;
+import com.example.mobilephone.ViewModels.UserViewModel;
 
-import java.io.IOException;
+import javax.inject.Inject;
 
-import okhttp3.Credentials;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
+import dagger.android.AndroidInjection;
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
 
     // UI references.
     private TextView mUserView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+    private UserViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,36 +44,37 @@ public class LoginActivity extends AppCompatActivity {
         // Set up the login form.
         mUserView = (TextView) findViewById(R.id.username);
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
+        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                attemptLogin();
+                return true;
             }
+            return false;
         });
 
         Button mLoginButton = (Button) findViewById(R.id.login_button);
-        mLoginButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+        mLoginButton.setOnClickListener(view -> attemptLogin());
 
         TextView mCreateAccount = (TextView) findViewById(R.id.create_account);
-        mCreateAccount.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent registerAccountActivity = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(registerAccountActivity);
-            }
+        mCreateAccount.setOnClickListener(v -> {
+            finish();
+            Intent registerAccountActivity = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(registerAccountActivity);
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        this.configureDagger();
+        this.configureViewModel();
+    }
+
+    private void configureDagger() {
+        AndroidInjection.inject(this);
+    }
+
+    private void configureViewModel() {
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(UserViewModel.class);
     }
 
     /**
@@ -88,9 +83,6 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mUserView.setError(null);
@@ -125,9 +117,19 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            viewModel.init(email, password);
+            viewModel.getUser().observe(this, user -> {
+                if(user != null) {
+                    startMainActivity();
+                }
+            });
         }
+    }
+
+    private void startMainActivity() {
+        finish();
+        Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
+        LoginActivity.this.startActivity(mainActivityIntent);
     }
 
     /**
@@ -163,80 +165,6 @@ public class LoginActivity extends AppCompatActivity {
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mUsername;
-        private final String mPassword;
-
-        private static final String webEndpoint = "http://10.0.2.2:8000/api/user/";
-
-        UserLoginTask(String username, String password) {
-            mUsername = username;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            int status;
-
-            try {
-                status = authenticateUser();
-            } catch (IOException e) {
-                return false;
-            }
-
-            return status == 200;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                saveCredentials();
-                finish();
-                Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
-                LoginActivity.this.startActivity(mainActivityIntent);
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        private void saveCredentials() {
-            SharedPreferences sp=getSharedPreferences("Login", MODE_PRIVATE);
-            SharedPreferences.Editor Ed=sp.edit();
-            Ed.putString("Username",mUsername );
-            Ed.putString("Password",mPassword);
-            Ed.commit();
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-
-        private int authenticateUser() throws IOException {
-            OkHttpClient client = new OkHttpClient();
-
-            String credentials = Credentials.basic(mUsername, mPassword);
-            Request request = new Request.Builder()
-                    .url(webEndpoint + mUsername + "/")
-                    .addHeader("Authorization", credentials)
-                    .addHeader("cache-control", "no-cache")
-                    .build();
-            try(Response response = client.newCall(request).execute()) {
-                return response.code();
-            }
         }
     }
 }

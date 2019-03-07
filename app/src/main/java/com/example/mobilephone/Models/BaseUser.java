@@ -3,9 +3,11 @@ package com.example.mobilephone.Models;
 import com.google.gson.annotations.SerializedName;
 
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 @Entity
 public class BaseUser {
+    @PrimaryKey
     @SerializedName("username")
     private String username;
 

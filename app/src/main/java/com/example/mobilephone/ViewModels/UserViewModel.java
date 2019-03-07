@@ -21,11 +21,11 @@ public class UserViewModel extends ViewModel {
         this.userRepository = userRepository;
     }
 
-    public void init(User user) {
+    public void init(String username, String password) {
         if (this.user != null) {
             return;
         }
-        this.user = userRepository.getUser(user);
+        this.user = userRepository.getUser(username, password);
     }
 
     public void createUser(String username, String password, String email, String firstName,
@@ -39,5 +39,7 @@ public class UserViewModel extends ViewModel {
         userRepository.createUser(user, consumer);
     }
 
-    public LiveData<User> getUser() { return this.user; }
+    public LiveData<User> getUser() {
+        return this.user;
+    }
 }

@@ -1,10 +1,8 @@
 package com.example.mobilephone.Repositories;
 
-import android.os.Debug;
 import android.util.Log;
 
 import com.example.mobilephone.Databases.UserDao;
-import com.example.mobilephone.Models.StepSummary;
 import com.example.mobilephone.Models.User;
 import com.example.mobilephone.Services.LogistepsService;
 
@@ -42,9 +40,9 @@ public class UserRepository {
         createNewUser(user, consumer);
     }
 
-    public LiveData<User> getUser(User user) {
-        refreshUser(user);
-        return userDao.load(user.getId());
+    public LiveData<User> getUser(String username, String password) {
+        refreshUser(username, password);
+        return userDao.load(username);
     }
 
     private void createNewUser(User user, Consumer<Integer> consumer) {
@@ -63,13 +61,13 @@ public class UserRepository {
         });
     }
 
-    private void refreshUser(final User user) {
+    private void refreshUser(final String username, final String password) {
         executor.execute(() -> {
-            User userExists = userDao.hasUser(user.getId(), getMaxRefreshTime(new Date()));
-            if (userExists == null) {
+            User userExists = userDao.hasUser(username, getMaxRefreshTime(new Date()));
+            if (userExists == null && password != null) {
                 try {
-                    Response<User> response = webservice.getUser(user.getBaseUser().getUsername(),
-                            Credentials.basic(user.getBaseUser().getUsername(), user.getBaseUser().getPassword()))
+                    Response<User> response = webservice.getUser(username,
+                            Credentials.basic(username, password))
                             .execute();
                     userDao.save(response.body());
                 } catch (IOException e) {
