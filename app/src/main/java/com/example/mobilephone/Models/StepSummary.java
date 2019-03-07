@@ -69,6 +69,12 @@ public class StepSummary {
         this.id = id;
     }
 
+    public void generateID() {
+        if (id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
+
     public int getSteps() {
         return steps;
     }

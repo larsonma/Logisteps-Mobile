@@ -174,7 +174,7 @@ public class RegisterActivity extends AppCompatActivity {
             viewModel.createUser(username, password, email, firstName, lastName, lFootSize, rFootSize,
                     height, weight, stepGoal, status -> {
                 if(status == 201) {
-                    startMainIntent();
+                    startMainIntent(username, password);
                 } else {
                     RegisterActivity.this.mUsername.setError(getString(R.string.error_user_taken));
                     RegisterActivity.this.mUsername.requestFocus();
@@ -183,9 +183,11 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private void startMainIntent() {
+    private void startMainIntent(String username, String password) {
         finish();
         Intent mainActivityIntent = new Intent(RegisterActivity.this, MainActivity.class);
+        mainActivityIntent.putExtra("username", username);
+        mainActivityIntent.putExtra("password", password);
         RegisterActivity.this.startActivity(mainActivityIntent);
     }
 

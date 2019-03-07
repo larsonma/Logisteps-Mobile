@@ -17,7 +17,7 @@ public interface StepSummaryDao {
     @Insert(onConflict = REPLACE)
     void save(StepSummary stepSummary);
     @Query("SELECT * FROM StepSummary WHERE id = :summaryId")
-    LiveData<StepSummary> load(int summaryId);
+    LiveData<StepSummary> load(String summaryId);
     @Query("SELECT * FROM StepSummary WHERE id == :summaryId AND lastRefresh >= :timeout")
-    StepSummary hasStepSummary(int summaryId, Date timeout);
+    StepSummary hasStepSummary(String summaryId, Date timeout);
 }

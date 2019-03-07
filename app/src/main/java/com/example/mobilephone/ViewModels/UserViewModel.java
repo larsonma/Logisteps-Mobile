@@ -14,7 +14,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 public class UserViewModel extends ViewModel {
-    private LiveData<User> user;
+    private LiveData<User> liveUser;
+    private User user;
     private UserRepository userRepository;
 
     @Inject
@@ -23,10 +24,17 @@ public class UserViewModel extends ViewModel {
     }
 
     public void init(String username, String password) {
-        if (this.user != null) {
+        if (this.liveUser != null) {
             return;
         }
-        this.user = userRepository.getLiveUser(username, password);
+        this.liveUser = userRepository.getLiveUser(username, password);
+        try {
+           this.user = userRepository.getUser(username, password);
+        } catch (ExecutionException e) {
+
+        } catch (InterruptedException e) {
+
+        }
     }
 
     public void createUser(String username, String password, String email, String firstName,
@@ -40,7 +48,11 @@ public class UserViewModel extends ViewModel {
         userRepository.createUser(user, consumer);
     }
 
-    public LiveData<User> getUser() {
+    public LiveData<User> getLiveUser() {
+        return this.liveUser;
+    }
+
+    public User getUser() {
         return this.user;
     }
 
@@ -49,6 +61,7 @@ public class UserViewModel extends ViewModel {
         boolean result = false;
         try {
             User user = userRepository.getUser(username, password);
+            this.user = user;
 
             result = user != null && username.equals(user.getBaseUser().getUsername())
                     && password.equals(user.getBaseUser().getPassword());

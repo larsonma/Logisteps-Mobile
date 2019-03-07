@@ -35,13 +35,13 @@ public class StepSummaryRepository {
         this.executor = executor;
     }
 
-    public LiveData<StepSummary> getStepSummary(User user, int summaryId) {
+    public LiveData<StepSummary> getStepSummary(User user, String summaryId) {
         refreshStepSummary(user, summaryId);
         // Returns a LiveData object directly from the database.
         return stepSummaryDao.load(summaryId);
     }
 
-    private void refreshStepSummary(final User user, final int summaryId) {
+    private void refreshStepSummary(final User user, final String summaryId) {
         // Runs in a background thread.
         executor.execute(() -> {
             StepSummary stepSummaryExists = stepSummaryDao.hasStepSummary(summaryId, getMaxRefreshTime(new Date()));
@@ -49,7 +49,11 @@ public class StepSummaryRepository {
                 //Refreshes the data.
                 try {
                     Response<StepSummary> response = webservice.getStepSummary(Credentials.basic(user.getBaseUser().getUsername(), user.getBaseUser().getPassword())).execute();
-                    stepSummaryDao.save(response.body());
+
+                    //Step summary needs an ID so the UI can reference it later
+                    StepSummary stepSummary = response.body();
+                    stepSummary.setId(summaryId);
+                    stepSummaryDao.save(stepSummary);
                 } catch (IOException e) {
                     //TODO: Check for errors
                 }

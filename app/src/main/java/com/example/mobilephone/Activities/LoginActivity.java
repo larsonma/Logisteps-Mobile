@@ -118,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
             // perform the user login attempt.
             showProgress(true);
             if (viewModel.authenticateUser(email, password)) {
-                startMainActivity();
+                startMainActivity(email, password);
             } else {
                 showProgress(false);
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -127,9 +127,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void startMainActivity() {
+    private void startMainActivity(String username, String password) {
         finish();
         Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
+        mainActivityIntent.putExtra("username", username);
+        mainActivityIntent.putExtra("password", password);
         LoginActivity.this.startActivity(mainActivityIntent);
     }
 

@@ -1,9 +1,12 @@
 package com.example.mobilephone.Activities;
 
 import androidx.lifecycle.ViewModelProvider;
-import android.content.SharedPreferences;
+
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
+import dagger.android.AndroidInjection;
+
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,6 +15,9 @@ import android.widget.TextView;
 
 import com.example.mobilephone.R;
 import com.example.mobilephone.ViewModels.StepSummaryViewModel;
+import com.example.mobilephone.ViewModels.UserViewModel;
+
+import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,10 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLShoeStatus;
     private TextView mRShoeStatus;
 
-    private StepSummaryViewModel viewModel;
-
-    String username = null;
-    String password = null;
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+    private StepSummaryViewModel stepSummaryViewModel;
+    private UserViewModel userViewModel;
 
 
     @Override
@@ -69,17 +75,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        setUserCredentials();
-//        viewModel.getStepSummary().observe(this, stepSummary -> {
-//            // TODO: update UI
-//        });
+        this.configureDagger();
+        this.configureViewModel();
+
+        Bundle userInto = getIntent().getExtras();
+        userViewModel.init(userInto.getString("username"), userInto.getString("password"));
+        stepSummaryViewModel.init(userViewModel.getUser(), 0);
+        stepSummaryViewModel.getStepSummary().observe(this, stepSummary -> {
+            if (stepSummary != null) {
+                this.mStepsTaken.setText("" + stepSummary.getGoal());
+                this.mStepsPerHr.setText("" + (int)stepSummary.getStepsPerHour());
+                this.mProjectedSteps.setText("" + stepSummaryViewModel.getProjectedSteps());
+            }
+        });
     }
 
-    private void setUserCredentials() {
-        SharedPreferences userCredentials = getSharedPreferences("Login", MODE_PRIVATE);
+    private void configureDagger() {
+        AndroidInjection.inject(this);
+    }
 
-        username = userCredentials.getString("Username", null);
-        password = userCredentials.getString("Password", null);
+    private void configureViewModel() {
+        userViewModel = ViewModelProviders.of(this, viewModelFactory).get(UserViewModel.class);
+        stepSummaryViewModel = ViewModelProviders.of(this, viewModelFactory).get(StepSummaryViewModel.class);
     }
 
     public class StepsSummaryTask extends AsyncTask<Void, Void, Boolean> {
