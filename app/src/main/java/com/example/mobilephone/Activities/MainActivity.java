@@ -21,11 +21,6 @@ import javax.inject.Inject;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * Async Task for fetching user data step data for the day.
-     */
-    private StepsSummaryTask summaryTask = null;
-
     // UI References
     private TextView mStepGoal;
     private TextView mStepsTaken;
@@ -100,12 +95,5 @@ public class MainActivity extends AppCompatActivity {
     private void configureViewModel() {
         userViewModel = ViewModelProviders.of(this, viewModelFactory).get(UserViewModel.class);
         stepSummaryViewModel = ViewModelProviders.of(this, viewModelFactory).get(StepSummaryViewModel.class);
-    }
-
-    public class StepsSummaryTask extends AsyncTask<Void, Void, Boolean> {
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            return false;
-        }
     }
 }
