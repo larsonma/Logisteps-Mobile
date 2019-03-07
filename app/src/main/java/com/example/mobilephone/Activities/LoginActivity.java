@@ -117,12 +117,13 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            viewModel.init(email, password);
-            viewModel.getUser().observe(this, user -> {
-                if(user != null) {
-                    startMainActivity();
-                }
-            });
+            if (viewModel.authenticateUser(email, password)) {
+                startMainActivity();
+            } else {
+                showProgress(false);
+                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.requestFocus();
+            }
         }
     }
 

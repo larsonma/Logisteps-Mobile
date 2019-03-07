@@ -9,7 +9,11 @@ import com.example.mobilephone.Services.LogistepsService;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -40,25 +44,51 @@ public class UserRepository {
         createNewUser(user, consumer);
     }
 
-    public LiveData<User> getUser(String username, String password) {
+    public LiveData<User> getLiveUser(String username, String password) {
         refreshUser(username, password);
-        return userDao.load(username);
+        return userDao.loadLive(username);
+    }
+
+    public User getUser(String username, String password) throws ExecutionException, InterruptedException {
+        Callable<User> callable = () -> {
+            refreshUserSync(username, password);
+            return userDao.load(username);
+        };
+
+        Future<User> future = Executors.newSingleThreadExecutor().submit(callable);
+        return future.get();
     }
 
     private void createNewUser(User user, Consumer<Integer> consumer) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Response<User> response = webservice.postUser(user).execute();
-                    userDao.save(user);
-                    consumer.accept(response.code());
-                } catch (IOException e) {
-                    // TODO: check for errors
-                    Log.e(TAG, e.toString());
-                }
+        executor.execute(() -> {
+            try {
+                Response<User> response = webservice.postUser(user).execute();
+                userDao.save(user);
+                consumer.accept(response.code());
+            } catch (IOException e) {
+                // TODO: check for errors
+                Log.e(TAG, e.toString());
             }
         });
+    }
+
+    private void refreshUserSync(final String username, final String password) {
+        User userExists = userDao.hasUser(username, getMaxRefreshTime(new Date()));
+        if (userExists == null && password != null) {
+            try {
+                Response<User> response = webservice.getUser(username,
+                        Credentials.basic(username, password))
+                        .execute();
+                if (response.code() == 200) {
+                    User user = response.body();
+                    user.getBaseUser().setPassword(password);
+
+                    userDao.save(user);
+                }
+            } catch (IOException e) {
+                // TODO: check for errors
+            }
+        }
     }
 
     private void refreshUser(final String username, final String password) {
@@ -69,7 +99,12 @@ public class UserRepository {
                     Response<User> response = webservice.getUser(username,
                             Credentials.basic(username, password))
                             .execute();
-                    userDao.save(response.body());
+                    if (response.code() == 200) {
+                        User user = response.body();
+                        user.getBaseUser().setPassword(password);
+
+                        userDao.save(user);
+                    }
                 } catch (IOException e) {
                     // TODO: check for errors
                 }

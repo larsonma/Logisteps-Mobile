@@ -5,6 +5,7 @@ import com.example.mobilephone.Models.Shoe;
 import com.example.mobilephone.Models.User;
 import com.example.mobilephone.Repositories.UserRepository;
 
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -25,7 +26,7 @@ public class UserViewModel extends ViewModel {
         if (this.user != null) {
             return;
         }
-        this.user = userRepository.getUser(username, password);
+        this.user = userRepository.getLiveUser(username, password);
     }
 
     public void createUser(String username, String password, String email, String firstName,
@@ -41,5 +42,21 @@ public class UserViewModel extends ViewModel {
 
     public LiveData<User> getUser() {
         return this.user;
+    }
+
+
+    public boolean authenticateUser(String username, String password) {
+        boolean result = false;
+        try {
+            User user = userRepository.getUser(username, password);
+
+            result = user != null && username.equals(user.getBaseUser().getUsername())
+                    && password.equals(user.getBaseUser().getPassword());
+        } catch (ExecutionException e) {
+
+        } catch (InterruptedException e) {
+
+        }
+        return result;
     }
 }

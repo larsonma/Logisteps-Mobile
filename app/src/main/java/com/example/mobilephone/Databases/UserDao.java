@@ -17,7 +17,9 @@ public interface UserDao {
     @Insert(onConflict = REPLACE)
     void save(User user);
     @Query("SELECT * FROM user WHERE usr_username = :username")
-    LiveData<User> load(String username);
+    LiveData<User> loadLive(String username);
     @Query("SELECT * FROM User WHERE usr_username == :username AND lastRefresh >= :timeout")
     User hasUser(String username, Date timeout);
+    @Query("SELECT * FROM user WHERE usr_username = :username")
+    User load(String username);
 }
