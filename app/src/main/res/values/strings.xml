@@ -46,4 +46,5 @@
     <string name="connect">Connect</string>
     <string name="default_num">--</string>
     <string name="disconnected">disconnected</string>
+    <string name="steps_tot">Total Steps</string>
 </resources>

@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private StepsSummaryTask summaryTask = null;
 
     // UI References
+    private TextView mStepGoal;
     private TextView mStepsTaken;
     private TextView mStepsPerHr;
     private TextView mProjectedSteps;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Setup the UI
+        mStepGoal = (TextView) findViewById(R.id.stepGoal);
         mStepsTaken = (TextView) findViewById(R.id.stepsTaken);
         mStepsPerHr = (TextView) findViewById(R.id.stepsPerHour);
         mProjectedSteps = (TextView) findViewById(R.id.projectedSteps);
@@ -83,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
         stepSummaryViewModel.init(userViewModel.getUser(), 0);
         stepSummaryViewModel.getStepSummary().observe(this, stepSummary -> {
             if (stepSummary != null) {
-                this.mStepsTaken.setText("" + stepSummary.getGoal());
+                this.mStepGoal.setText("" + stepSummary.getGoal());
+                this.mStepsTaken.setText("" + stepSummary.getSteps());
                 this.mStepsPerHr.setText("" + (int)stepSummary.getStepsPerHour());
                 this.mProjectedSteps.setText("" + stepSummaryViewModel.getProjectedSteps());
             }
