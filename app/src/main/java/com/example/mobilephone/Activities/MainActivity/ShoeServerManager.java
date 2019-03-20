@@ -22,16 +22,14 @@ import no.nordicsemi.android.ble.error.GattError;
 import no.nordicsemi.android.ble.utils.ParserUtils;
 import no.nordicsemi.android.log.LogContract;
 
-import static android.service.notification.Condition.stateToString;
-
 // This class sets up the GATT server and the necessary services
 public class ShoeServerManager {
     private final String TAG = "ShoeServerManager";
 
     /** data characteristic UUID */
-    final static UUID DATA_CHARACTERISTIC_UUID = UUID.fromString("00001111-1212-efde-1523-785fef13d123");
+    final static UUID SENSOR1_DATA_CHARACTERISTIC_UUID = UUID.fromString("00001111-1212-efde-1523-785fef13d123");
     /** Time characteristic UUID */
-    final static UUID TIME_CHARACTERISTIC_UUID = UUID.fromString("00002222-1212-efde-1523-785fef13d123");
+    final static UUID SENSOR2_DATA_CHARACTERISTIC_UUID = UUID.fromString("00002222-1212-efde-1523-785fef13d123");
     /** Service UUID */
     final static UUID LOGISTEPS_SERVICE_UUID = UUID.fromString("00000000-1212-efde-1523-785fef13d123");
 
@@ -171,11 +169,11 @@ public class ShoeServerManager {
          * This method must be called in UI thread. It works fine on Nexus devices but if called
          * from other thread (e.g. from onServiceAdded in gatt server callback) it hangs the app.
          */
-        final BluetoothGattCharacteristic deviceData = new BluetoothGattCharacteristic(DATA_CHARACTERISTIC_UUID,
+        final BluetoothGattCharacteristic deviceData = new BluetoothGattCharacteristic(SENSOR1_DATA_CHARACTERISTIC_UUID,
                 BluetoothGattCharacteristic.PROPERTY_READ,
                 BluetoothGattCharacteristic.PERMISSION_READ);
 
-        final BluetoothGattCharacteristic timeData = new BluetoothGattCharacteristic(TIME_CHARACTERISTIC_UUID,
+        final BluetoothGattCharacteristic timeData = new BluetoothGattCharacteristic(SENSOR2_DATA_CHARACTERISTIC_UUID,
                 BluetoothGattCharacteristic.PERMISSION_WRITE,
                 BluetoothGattCharacteristic.PERMISSION_WRITE);
 

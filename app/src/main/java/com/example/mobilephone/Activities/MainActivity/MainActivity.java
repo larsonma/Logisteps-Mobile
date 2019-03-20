@@ -167,6 +167,7 @@ public class MainActivity extends BleMulticonnectProfileServiceReadyActivity<Sho
                 this.mProjectedSteps.setText("" + stepSummaryViewModel.getProjectedSteps());
             }
         });
+
     }
 
     @Override
