@@ -85,9 +85,9 @@ public class ScannerActivity extends AppCompatActivity implements DevicesAdapter
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
 		recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 		((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
-		final DevicesAdapter adapter = new DevicesAdapter(this, mScannerViewModel.getDevices());
-		adapter.setOnItemClickListener(this);
-		recyclerView.setAdapter(adapter);
+//		final DevicesAdapter adapter = new DevicesAdapter(this, mScannerViewModel.getDevices());
+//		adapter.setOnItemClickListener(this);
+//		recyclerView.setAdapter(adapter);
 	}
 
 	@Override
