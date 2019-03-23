@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.mobilephone.Activities.MainActivity;
 import com.example.mobilephone.Bluetooth.ScannerActivity;
 import com.example.mobilephone.Bluetooth.viewmodels.DevicesLiveData;
 import com.example.mobilephone.R;
@@ -60,7 +61,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.ViewHold
 	}
 
 	@SuppressWarnings("ConstantConditions")
-	public DevicesAdapter(@NonNull final ScannerActivity activity,
+	public DevicesAdapter(@NonNull final MainActivity activity,
 						  @NonNull final DevicesLiveData devicesLiveData) {
 		mContext = activity;
 		setHasStableIds(true);
