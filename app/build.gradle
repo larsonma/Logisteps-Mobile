@@ -61,4 +61,16 @@ dependencies {
 
     //Retrofit2 Debugging
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+
+    // Lifecycle extensions
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    // Butter Knife
+    implementation 'com.jakewharton:butterknife:10.0.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+    // Brings the new BluetoothLeScanner API to older platforms
+    implementation 'no.nordicsemi.android.support.v18:scanner:1.4.0'
+    // Log Bluetooth LE events in nRF Logger
+    implementation 'no.nordicsemi.android:log:2.2.0'
+    // BLE library
+    implementation 'no.nordicsemi.android:ble:2.1.0'
 }
