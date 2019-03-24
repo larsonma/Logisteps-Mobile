@@ -55,13 +55,13 @@
 			android:visibility="invisible"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="@+id/recycler_view_ble_devices"
+			app:layout_constraintTop_toTopOf="@+id/recyclerView"
 			tools:ignore="UnusedAttribute"/>
 
 	</com.google.android.material.appbar.AppBarLayout>
 
 	<androidx.recyclerview.widget.RecyclerView
-		android:id="@+id/recycler_view_ble_devices"
+		android:id="@+id/recyclerView"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
 		android:clipToPadding="false"

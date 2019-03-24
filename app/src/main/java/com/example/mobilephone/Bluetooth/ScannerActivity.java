@@ -81,7 +81,7 @@ public class ScannerActivity extends AppCompatActivity implements DevicesAdapter
 		mScannerViewModel.getScannerState().observe(this, this::startScan);
 
 		// Configure the recycler view
-		final RecyclerView recyclerView = findViewById(R.id.recycler_view_ble_devices);
+		final RecyclerView recyclerView = findViewById(R.id.recyclerView);
 		recyclerView.setLayoutManager(new LinearLayoutManager(this));
 		recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 		((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
