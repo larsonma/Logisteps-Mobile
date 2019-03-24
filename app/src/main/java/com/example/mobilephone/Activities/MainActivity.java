@@ -75,13 +75,13 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        final Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        //final Toolbar toolbar = findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        //getSupportActionBar().setTitle(R.string.app_name);
 
         // Create view model containing utility methods for scanning
         mScannerViewModel = ViewModelProviders.of(this).get(ScannerViewModel.class);
-        mScannerViewModel.getScannerState().observe(this, this::startScan);
+        //mScannerViewModel.getScannerState().observe(this, this::startScan);
 
         // Configure the recycler view
         final RecyclerView recyclerView = findViewById(R.id.recycler_view_ble_devices);
@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
             @Override
             public void onClick(View v) {
                 // TODO: start new service for left shoe bluetooth
+                mScannerViewModel.getScannerState().observe(MainActivity.this, MainActivity.this::startScan);
             }
         });
 

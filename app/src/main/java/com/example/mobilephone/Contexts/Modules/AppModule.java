@@ -59,7 +59,7 @@ public class AppModule {
     }
 
     //API
-    private static String BASE_URL = "http://10.0.2.2:8000/api/";
+    private static String BASE_URL = "http://192.168.23.18:8000/api/";
 
     @Provides
     Gson provideGson() {
