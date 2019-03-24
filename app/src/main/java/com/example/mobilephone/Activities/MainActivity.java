@@ -1,7 +1,7 @@
 package com.example.mobilephone.Activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -9,7 +9,7 @@ import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -28,12 +28,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.mobilephone.Bluetooth.BlinkyActivity;
 import com.example.mobilephone.Bluetooth.adapter.DevicesAdapter;
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
 import com.example.mobilephone.Bluetooth.utils.Utils;
+import com.example.mobilephone.Bluetooth.viewmodels.BlinkyViewModel;
 import com.example.mobilephone.Bluetooth.viewmodels.ScannerStateLiveData;
 import com.example.mobilephone.Bluetooth.viewmodels.ScannerViewModel;
 import com.example.mobilephone.R;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 1022; // random number
 
     private ScannerViewModel mScannerViewModel;
+    private BlinkyViewModel mBlinkyViewModel;
 
     @BindView(R.id.state_scanning) View mScanningView;
     @BindView(R.id.no_devices)View mEmptyView;
@@ -62,12 +64,14 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     private TextView mProjectedSteps;
     private TextView mLShoeStatus;
     private TextView mRShoeStatus;
+    private ConstraintLayout mStepsLayout;
+    private LinearLayout mProgressContainer;
+    private RecyclerView recyclerView;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     private StepSummaryViewModel stepSummaryViewModel;
     private UserViewModel userViewModel;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,8 +87,10 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         mScannerViewModel = ViewModelProviders.of(this).get(ScannerViewModel.class);
         //mScannerViewModel.getScannerState().observe(this, this::startScan);
 
+        mBlinkyViewModel = ViewModelProviders.of(this).get(BlinkyViewModel.class);
+
         // Configure the recycler view
-        final RecyclerView recyclerView = findViewById(R.id.recycler_view_ble_devices);
+        recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
@@ -99,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         mProjectedSteps = (TextView) findViewById(R.id.projectedSteps);
         mLShoeStatus = (TextView) findViewById(R.id.leftShoeStatus);
         mRShoeStatus = (TextView) findViewById(R.id.rightShoeStatus);
+        mStepsLayout = (ConstraintLayout) findViewById(R.id.stepsLayout);
+        mProgressContainer = (LinearLayout) findViewById(R.id.progress_container);
+        mProgressContainer.setVisibility(View.INVISIBLE);
 
         Button mAccountButton = (Button) findViewById(R.id.accountButton);
         mAccountButton.setOnClickListener(new OnClickListener() {
@@ -113,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
             @Override
             public void onClick(View v) {
                 // TODO: start new service for left shoe bluetooth
+                mStepsLayout.setVisibility(View.INVISIBLE);
                 mScannerViewModel.getScannerState().observe(MainActivity.this, MainActivity.this::startScan);
             }
         });
@@ -178,9 +188,21 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
 
     @Override
     public void onItemClick(@NonNull final DiscoveredBluetoothDevice device) {
-        final Intent controlBlinkIntent = new Intent(this, BlinkyActivity.class);
-        controlBlinkIntent.putExtra(BlinkyActivity.EXTRA_DEVICE, device);
-        startActivity(controlBlinkIntent);
+        mProgressContainer.setVisibility(View.VISIBLE);
+
+        //TODO Change text from disconnected to connected and bring back stepsView
+        //mStepsLayout.setVisibility(View.VISIBLE);
+
+        mBlinkyViewModel.connect(device);
+
+        mBlinkyViewModel.isConnected().observe(this, this::onDeviceConnect);
+
+
+        //final Intent controlBlinkIntent = new Intent(this, BlinkyActivity.class);
+        //controlBlinkIntent.putExtra(BlinkyActivity.EXTRA_DEVICE, device);
+        //startActivity(controlBlinkIntent);
+
+        //TODO Start data services behind the scenes.
     }
 
     @Override
@@ -291,5 +313,15 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     private void configureViewModel() {
         userViewModel = ViewModelProviders.of(this, viewModelFactory).get(UserViewModel.class);
         stepSummaryViewModel = ViewModelProviders.of(this, viewModelFactory).get(StepSummaryViewModel.class);
+    }
+
+    private void onDeviceConnect(final boolean connected) {
+        if(connected) {
+            mProgressContainer.setVisibility(View.INVISIBLE);
+            recyclerView.setVisibility(View.INVISIBLE);
+            mStepsLayout.setVisibility(View.VISIBLE);
+            mLShoeStatus.setText("connected");
+            mLShoeStatus.setTextColor(getResources().getColor(R.color.Green));
+        }
     }
 }
