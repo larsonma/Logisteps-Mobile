@@ -124,7 +124,7 @@ public class BlinkyViewModel extends AndroidViewModel implements BlinkyManagerCa
 	/**
 	 * Disconnect from peripheral.
 	 */
-	private void disconnect() {
+	public void disconnect() {
 		mDevice = null;
 		mBlinkyManager.disconnect().enqueue();
 	}

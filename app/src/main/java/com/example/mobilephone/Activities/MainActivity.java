@@ -3,6 +3,7 @@ package com.example.mobilephone.Activities;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     private TextView mProjectedSteps;
     private TextView mLShoeStatus;
     private TextView mRShoeStatus;
+    private Button mLShoeConnectButton;
+    private Button mRShoeConnectButton;
     private ConstraintLayout mStepsLayout;
     private LinearLayout mProgressContainer;
     private RecyclerView recyclerView;
@@ -99,12 +102,15 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         recyclerView.setAdapter(adapter);
 
         // Setup the UI
-        mStepGoal = (TextView) findViewById(R.id.stepGoal);
-        mStepsTaken = (TextView) findViewById(R.id.stepsTaken);
-        mStepsPerHr = (TextView) findViewById(R.id.stepsPerHour);
-        mProjectedSteps = (TextView) findViewById(R.id.projectedSteps);
-        mLShoeStatus = (TextView) findViewById(R.id.leftShoeStatus);
-        mRShoeStatus = (TextView) findViewById(R.id.rightShoeStatus);
+        mStepGoal = findViewById(R.id.stepGoal);
+        mStepsTaken = findViewById(R.id.stepsTaken);
+        mStepsPerHr = findViewById(R.id.stepsPerHour);
+        mProjectedSteps = findViewById(R.id.projectedSteps);
+        mLShoeStatus = findViewById(R.id.leftShoeStatus);
+        mRShoeStatus = findViewById(R.id.rightShoeStatus);
+        mLShoeConnectButton = findViewById(R.id.leftShoeConnect);
+        mRShoeConnectButton = findViewById(R.id.rightShoeConnect);
+
         mStepsLayout = (ConstraintLayout) findViewById(R.id.stepsLayout);
         mProgressContainer = (LinearLayout) findViewById(R.id.progress_container);
         mProgressContainer.setVisibility(View.INVISIBLE);
@@ -117,17 +123,27 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
             }
         });
 
-        Button mLShoeConnectButton = (Button) findViewById(R.id.leftShoeConnect);
         mLShoeConnectButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO: start new service for left shoe bluetooth
-                mStepsLayout.setVisibility(View.INVISIBLE);
-                mScannerViewModel.getScannerState().observe(MainActivity.this, MainActivity.this::startScan);
+                if((mBlinkyViewModel.isConnected().getValue() == null) || (!mBlinkyViewModel.isConnected().getValue())) {
+                    mStepsLayout.setVisibility(View.INVISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    clear();
+                    mScannerViewModel.getScannerState().observe(MainActivity.this, MainActivity.this::startScan);
+                } else {
+                    mBlinkyViewModel.disconnect();
+                    mScannerViewModel.getScannerState().removeObserver(MainActivity.this::startScan);
+                    mLShoeStatus.setTextColor(getResources().getColor(R.color.Red));
+                    mLShoeStatus.setText(getString(R.string.disconnected));
+                    mLShoeConnectButton.setText(getString(R.string.connect));
+                    // Use method to remove observer in order to get this of MainActivity
+                    removeMyObserver();
+                }
             }
         });
 
-        Button mRShoeConnectButton = (Button) findViewById(R.id.rightShoeConnect);
         mRShoeConnectButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,12 +206,9 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     public void onItemClick(@NonNull final DiscoveredBluetoothDevice device) {
         mProgressContainer.setVisibility(View.VISIBLE);
 
-        //TODO Change text from disconnected to connected and bring back stepsView
-        //mStepsLayout.setVisibility(View.VISIBLE);
-
         mBlinkyViewModel.connect(device);
 
-        mBlinkyViewModel.isConnected().observe(this, this::onDeviceConnect);
+        mBlinkyViewModel.isConnected().observe(this, this::onDeviceConnectionChange);
 
 
         //final Intent controlBlinkIntent = new Intent(this, BlinkyActivity.class);
@@ -315,13 +328,31 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         stepSummaryViewModel = ViewModelProviders.of(this, viewModelFactory).get(StepSummaryViewModel.class);
     }
 
-    private void onDeviceConnect(final boolean connected) {
+    private void onDeviceConnectionChange(final boolean connected) {
         if(connected) {
+            // Connected to device user selected
+            // Turn progress/recycler invisible
+            // Show steps
+            // Change connection status
             mProgressContainer.setVisibility(View.INVISIBLE);
             recyclerView.setVisibility(View.INVISIBLE);
             mStepsLayout.setVisibility(View.VISIBLE);
-            mLShoeStatus.setText("connected");
-            mLShoeStatus.setTextColor(getResources().getColor(R.color.Green));
+            mLShoeStatus.setText(getString(R.string.connected));
+            mLShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Green));
+            mLShoeConnectButton.setText(getString(R.string.disconnect));
+        } else {
+            // Disconnected from device
+            // Change connection status
+            // Remove observer
+            mLShoeStatus.setText(getString(R.string.disconnected));
+            mLShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Red));
+            mLShoeConnectButton.setText(getString(R.string.connect));
+            mBlinkyViewModel.isConnected().removeObserver(this::onDeviceConnectionChange);
+
         }
+    }
+
+    private void removeMyObserver() {
+        mBlinkyViewModel.isConnected().removeObserver(this::onDeviceConnectionChange);
     }
 }

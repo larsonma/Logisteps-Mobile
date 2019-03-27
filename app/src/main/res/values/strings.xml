@@ -44,8 +44,10 @@
     <string name="shoe_right">Right Shoe</string>
     <string name="status">Status:</string>
     <string name="connect">Connect</string>
+    <string name="connected">Connected</string>
     <string name="default_num">--</string>
-    <string name="disconnected">disconnected</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="disconnected">Disconnected</string>
     <string name="steps_tot">Total Steps</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_filter_uuid">Only devices advertising LBS UUID</string>
@@ -64,8 +66,8 @@
     <string name="button_summary">Press Button 1 on the dev kit.</string>
 
     <string name="location_permission_title">LOCATION PERMISSION REQUIRED</string>
-    <string name="location_permission_info">From Android 6.0 Marshmallow onwards the application requires Location permission in order to scan for Bluetooth Low Energy devices.
-      \n\nThis is because Bluetooth LE beacons, for example iBeacons or Eddystone, may be used to determine the phone\'s and user\'s location. <b>nRF Blinky</b> will not use this information in any way.</string>
+    <string name="location_permission_info">Android requires Location permission in order to scan for Bluetooth Low Energy devices.
+      \n\nThis is because Bluetooth LE beacons may be used to determine the phone\'s and user\'s location. Logisteps will not use this information in any way.</string>
     <string name="location_permission_action">Grant permission</string>
     <string name="location_permission_settings">Settings</string>
 
@@ -73,11 +75,11 @@
     <string name="bluetooth_disabled_info">The Bluetooth adapter is turned off. Click the button below to enable it.</string>
     <string name="bluetooth_disabled_action">Enable</string>
 
-    <string name="blinky_guide_title">CAN\'T SEE YOUR BLINKY?</string>
-    <string name="blinky_guide_info">1. Make sure the DK is <b>turned on</b> and is connected to a power source using a micro USB cable or a coin cell is plugged in.
-        \n\n2. Make sure the <b>ble_app_blinky</b> firmware and SoftDevice are flashed.</string>
-    <string name="blinky_guide_location_info">3. Location is turned off. Some Android phones require it enabled in order to scan for Bluetooth LE devices.
-		If you are sure your Blinky is advertising and it doesn\'t show up here, click the button below to enable Location.</string>
+    <string name="blinky_guide_title">Cab\'t see your LogiStep?</string>
+    <string name="blinky_guide_info"><b>1</b>. Make sure the insole is <b>in your shoe</b>.
+        \n\n<b>2</b>. Try walking around with the insole more.</string>
+    <string name="blinky_guide_location_info"><b>3</b>. Location may be turned off. Some Android phones require it enabled in order to scan for Bluetooth LE devices.
+		Click the button below to enable Location.</string>
     <string name="blinky_guide_location_action">Enable</string>
 
     <string name="not_supported_title">DEVICE NOT SUPPORTED</string>
