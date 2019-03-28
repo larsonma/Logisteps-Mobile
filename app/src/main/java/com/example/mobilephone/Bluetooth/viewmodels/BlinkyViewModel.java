@@ -59,7 +59,7 @@ public class BlinkyViewModel extends AndroidViewModel implements BlinkyManagerCa
 
 	// Flag that holds the pressed released state of the button on the devkit.
 	// Pressed is true, Released is false
-	private final MutableLiveData<Boolean> mButtonState = new MutableLiveData<>();
+	private final MutableLiveData<Integer> mButtonState = new MutableLiveData<>();
 
 	public LiveData<Void> isDeviceReady() {
 		return mOnDeviceReady;
@@ -73,7 +73,7 @@ public class BlinkyViewModel extends AndroidViewModel implements BlinkyManagerCa
 		return mIsConnected;
 	}
 
-	public LiveData<Boolean> getButtonState() {
+	public LiveData<Integer> getButtonState() {
 		return mButtonState;
 	}
 
@@ -143,8 +143,8 @@ public class BlinkyViewModel extends AndroidViewModel implements BlinkyManagerCa
 	}
 
 	@Override
-	public void onButtonStateChanged(@NonNull final BluetoothDevice device, final boolean pressed) {
-		mButtonState.postValue(pressed);
+	public void onButtonStateChanged(@NonNull final BluetoothDevice device, final int data) {
+		mButtonState.postValue(data);
 	}
 
 	@Override

@@ -47,16 +47,17 @@ import no.nordicsemi.android.log.Logger;
 
 public class BlinkyManager extends BleManager<BlinkyManagerCallbacks> {
 	/** Nordic Blinky Service UUID. */
-	public final static UUID LBS_UUID_SERVICE = UUID.fromString("00001523-1212-efde-1523-785feabcd123");
-//	public final static UUID LBS_UUID_SERVICE = UUID.fromString("00000000-1212-efde-1523-785fef13d123");
+//	public final static UUID LBS_UUID_SERVICE = UUID.fromString("00001523-1212-efde-1523-785feabcd123");
+	public final static UUID LBS_UUID_SERVICE = UUID.fromString("00000000-1212-efde-1523-785fef13d123");
 	/** BUTTON characteristic UUID. */
-	private final static UUID LBS_UUID_BUTTON_CHAR = UUID.fromString("00001524-1212-efde-1523-785feabcd123");
-//	public final static UUID LBS_UUID_BUTTON_CHAR = UUID.fromString("00001111-1212-efde-1523-785fef13d123");
+//	private final static UUID LBS_UUID_BUTTON_CHAR = UUID.fromString("00001524-1212-efde-1523-785feabcd123");
+	public final static UUID LBS_UUID_BUTTON_CHAR = UUID.fromString("00001111-1212-efde-1523-785fef13d123");
 	/** LED characteristic UUID. */
-	private final static UUID LBS_UUID_LED_CHAR = UUID.fromString("00001525-1212-efde-1523-785feabcd123");
-//	public final static UUID LBS_UUID_LED_CHAR = UUID.fromString("00002222-1212-efde-1523-785fef13d123");
+//	private final static UUID LBS_UUID_LED_CHAR = UUID.fromString("00001525-1212-efde-1523-785feabcd123");
+	public final static UUID LBS_UUID_LED_CHAR = UUID.fromString("00002222-1212-efde-1523-785fef13d123");
 
 	private BluetoothGattCharacteristic mButtonCharacteristic, mLedCharacteristic;
+	private BluetoothGattCharacteristic mTopCharacteristic, mBottomCharacteristic;
 	private LogSession mLogSession;
 	private boolean mSupported;
 	private boolean mLedOn;
@@ -102,9 +103,8 @@ public class BlinkyManager extends BleManager<BlinkyManagerCallbacks> {
 	private	final BlinkyButtonDataCallback mButtonCallback = new BlinkyButtonDataCallback() {
 		@Override
 		public void onButtonStateChanged(@NonNull final BluetoothDevice device,
-										 final boolean pressed) {
-			log(LogContract.Log.Level.APPLICATION, "Button " + (pressed ? "pressed" : "released"));
-			mCallbacks.onButtonStateChanged(device, pressed);
+										 final int data) {
+			mCallbacks.onButtonStateChanged(device, data);
 		}
 
 		@Override
@@ -178,6 +178,44 @@ public class BlinkyManager extends BleManager<BlinkyManagerCallbacks> {
 			mLedCharacteristic = null;
 		}
 	};
+	/**
+	 * BluetoothGatt callbacks object.
+	 */
+//	private final BleManagerGattCallback mGattCallback = new BleManagerGattCallback() {
+//		@Override
+//		protected void initialize() {
+//			setNotificationCallback(mTopCharacteristic).with();
+//			setNotificationCallback(mBottomCharacteristic).with();
+//			readCharacteristic(mTopCharacteristic).with().enqueue();
+//			readCharacteristic(mBottomCharacteristic).with().enqueue();
+//			enableNotifications(mTopCharacteristic).enqueue();
+//			enableNotifications(mBottomCharacteristic).enqueue();
+//		}
+//
+//		@Override
+//		public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
+//			final BluetoothGattService service = gatt.getService(LBS_UUID_SERVICE);
+//			if (service != null) {
+//				mButtonCharacteristic = service.getCharacteristic(LBS_UUID_BUTTON_CHAR);
+//				mLedCharacteristic = service.getCharacteristic(LBS_UUID_LED_CHAR);
+//			}
+//
+//			boolean writeRequest = false;
+//			if (mLedCharacteristic != null) {
+//				final int rxProperties = mLedCharacteristic.getProperties();
+//				writeRequest = (rxProperties & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0;
+//			}
+//
+//			mSupported = mButtonCharacteristic != null && mLedCharacteristic != null && writeRequest;
+//			return mSupported;
+//		}
+//
+//		@Override
+//		protected void onDeviceDisconnected() {
+//			mButtonCharacteristic = null;
+//			mLedCharacteristic = null;
+//		}
+//	};
 
 	/**
 	 * Sends a request to the device to turn the LED on or off.

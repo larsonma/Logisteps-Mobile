@@ -101,9 +101,9 @@ public class BlinkyActivity extends AppCompatActivity {
 			ledState.setText(isOn ? R.string.turn_on : R.string.turn_off);
 			mLed.setChecked(isOn);
 		});
-		mViewModel.getButtonState().observe(this,
-				pressed -> mButtonState.setText(pressed ?
-						R.string.button_pressed : R.string.button_released));
+//		mViewModel.getButtonState().observe(this,
+//				pressed -> mButtonState.setText(pressed ?
+//						R.string.button_pressed : R.string.button_released));
 	}
 
 	@OnClick(R.id.action_clear_cache)

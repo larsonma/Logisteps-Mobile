@@ -35,18 +35,12 @@ public abstract class BlinkyButtonDataCallback implements ProfileDataCallback, B
 
     @Override
     public void onDataReceived(@NonNull final BluetoothDevice device, @NonNull final Data data) {
-        if (data.size() != 1) {
+        if (data.size() != 2) {
             onInvalidDataReceived(device, data);
             return;
         }
 
-        final int state = data.getIntValue(Data.FORMAT_UINT8, 0);
-        if (state == STATE_PRESSED) {
-            onButtonStateChanged(device, true);
-        } else if (state == STATE_RELEASED) {
-            onButtonStateChanged(device, false);
-        } else {
-            onInvalidDataReceived(device, data);
-        }
+        int newData = data.getIntValue(Data.FORMAT_UINT16, 0);
+        onButtonStateChanged(device, newData);
     }
 }

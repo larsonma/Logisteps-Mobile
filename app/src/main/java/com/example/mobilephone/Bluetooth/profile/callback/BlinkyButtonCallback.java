@@ -34,5 +34,5 @@ public interface BlinkyButtonCallback {
      * @param device the target device.
      * @param pressed true if the button was pressed, false if released.
      */
-    void onButtonStateChanged(@NonNull final BluetoothDevice device, final boolean pressed);
+    void onButtonStateChanged(@NonNull final BluetoothDevice device, final int pressed);
 }
