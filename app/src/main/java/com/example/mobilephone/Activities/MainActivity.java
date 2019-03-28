@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     private TextView mProjectedSteps;
     private TextView mLShoeStatus;
     private TextView mRShoeStatus;
+    private TextView mBluetoothData;
     private Button mLShoeConnectButton;
     private Button mRShoeConnectButton;
     private ConstraintLayout mStepsLayout;
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         mProjectedSteps = findViewById(R.id.projectedSteps);
         mLShoeStatus = findViewById(R.id.leftShoeStatus);
         mRShoeStatus = findViewById(R.id.rightShoeStatus);
+        mBluetoothData = findViewById(R.id.BluetoothData);
         mLShoeConnectButton = findViewById(R.id.leftShoeConnect);
         mRShoeConnectButton = findViewById(R.id.rightShoeConnect);
 
@@ -121,6 +123,11 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
             public void onClick(View v) {
                 // TODO: start new activity for account details
             }
+        });
+
+        //Set observer for data
+        mBlinkyViewModel.getButtonState().observe(this, data -> {
+                this.mBluetoothData.setText("" + data);
         });
 
         mLShoeConnectButton.setOnClickListener(new OnClickListener() {
@@ -340,11 +347,6 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
             mLShoeStatus.setText(getString(R.string.connected));
             mLShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Green));
             mLShoeConnectButton.setText(getString(R.string.disconnect));
-
-            //Set observer for data
-//            mBlinkyViewModel.getButtonState().observe(this,
-//                    pressed -> mButtonState.setText(pressed ?
-//                            R.string.button_pressed : R.string.button_released));
         } else {
             // Disconnected from device
             // Change connection status
