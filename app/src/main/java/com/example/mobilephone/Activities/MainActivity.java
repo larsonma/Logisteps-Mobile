@@ -340,6 +340,11 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
             mLShoeStatus.setText(getString(R.string.connected));
             mLShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Green));
             mLShoeConnectButton.setText(getString(R.string.disconnect));
+
+            //Set observer for data
+//            mBlinkyViewModel.getButtonState().observe(this,
+//                    pressed -> mButtonState.setText(pressed ?
+//                            R.string.button_pressed : R.string.button_released));
         } else {
             // Disconnected from device
             // Change connection status

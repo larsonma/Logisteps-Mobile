@@ -59,7 +59,7 @@ public class AppModule {
     }
 
     //API
-    private static String BASE_URL = "http://192.168.1.4:8000/api/";
+    private static String BASE_URL = "https://senior-design-1549134040092.appspot.com/api/";
 
     @Provides
     Gson provideGson() {

@@ -45,7 +45,7 @@ public abstract class BlinkyLedDataCallback implements ProfileDataCallback, Data
     }
 
     private void parse(@NonNull final BluetoothDevice device, @NonNull final Data data) {
-        if (data.size() != 1) {
+        if (data.size() != 4) {
             onInvalidDataReceived(device, data);
             return;
         }
