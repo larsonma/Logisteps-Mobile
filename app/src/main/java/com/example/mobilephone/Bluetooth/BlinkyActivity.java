@@ -28,13 +28,11 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
-import com.example.mobilephone.Bluetooth.viewmodels.BlinkyViewModel;
+import com.example.mobilephone.Bluetooth.viewmodels.ShoeViewModel;
 import com.example.mobilephone.R;
 
 import butterknife.BindView;
@@ -45,7 +43,7 @@ import butterknife.OnClick;
 public class BlinkyActivity extends AppCompatActivity {
 	public static final String EXTRA_DEVICE = "no.nordicsemi.android.blinky.EXTRA_DEVICE";
 
-	private BlinkyViewModel mViewModel;
+	private ShoeViewModel mViewModel;
 
 	@BindView(R.id.led_switch) Switch mLed;
 	@BindView(R.id.button_state) TextView mButtonState;
@@ -68,7 +66,7 @@ public class BlinkyActivity extends AppCompatActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Configure the view model
-		mViewModel = ViewModelProviders.of(this).get(BlinkyViewModel.class);
+		mViewModel = ViewModelProviders.of(this).get(ShoeViewModel.class);
 		mViewModel.connect(device);
 
 		// Set up views

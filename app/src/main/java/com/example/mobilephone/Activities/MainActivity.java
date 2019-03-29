@@ -36,7 +36,7 @@ import android.widget.TextView;
 import com.example.mobilephone.Bluetooth.adapter.DevicesAdapter;
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
 import com.example.mobilephone.Bluetooth.utils.Utils;
-import com.example.mobilephone.Bluetooth.viewmodels.BlinkyViewModel;
+import com.example.mobilephone.Bluetooth.viewmodels.ShoeViewModel;
 import com.example.mobilephone.Bluetooth.viewmodels.ScannerStateLiveData;
 import com.example.mobilephone.Bluetooth.viewmodels.ScannerViewModel;
 import com.example.mobilephone.R;
@@ -48,8 +48,12 @@ import javax.inject.Inject;
 public class MainActivity extends AppCompatActivity implements DevicesAdapter.OnItemClickListener{
     private static final int REQUEST_ACCESS_COARSE_LOCATION = 1022; // random number
 
+    //UI ViewModels
+    private StepSummaryViewModel stepSummaryViewModel;
+    private UserViewModel userViewModel;
     private ScannerViewModel mScannerViewModel;
-    private BlinkyViewModel mBlinkyViewModel;
+    private ShoeViewModel mLShoeViewModel;
+    private ShoeViewModel mRSHoeViewModel;
 
     @BindView(R.id.state_scanning) View mScanningView;
     @BindView(R.id.no_devices)View mEmptyView;
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     @BindView(R.id.bluetooth_off) View mNoBluetoothView;
 
     // UI References
+    private ConstraintLayout mStepsLayout;
     private TextView mStepGoal;
     private TextView mStepsTaken;
     private TextView mStepsPerHr;
@@ -67,16 +72,15 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     private TextView mLShoeStatus;
     private TextView mRShoeStatus;
     private TextView mBluetoothData;
+
     private Button mLShoeConnectButton;
     private Button mRShoeConnectButton;
-    private ConstraintLayout mStepsLayout;
+
     private LinearLayout mProgressContainer;
     private RecyclerView recyclerView;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    private StepSummaryViewModel stepSummaryViewModel;
-    private UserViewModel userViewModel;
 
     SharedPreferences sharedPreferences;
 
@@ -86,15 +90,10 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //final Toolbar toolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        //getSupportActionBar().setTitle(R.string.app_name);
-
-        // Create view model containing utility methods for scanning
+        // Create viewModels for handling Bluetooth actions
         mScannerViewModel = ViewModelProviders.of(this).get(ScannerViewModel.class);
-        //mScannerViewModel.getScannerState().observe(this, this::startScan);
-
-        mBlinkyViewModel = ViewModelProviders.of(this).get(BlinkyViewModel.class);
+        mLShoeViewModel = ViewModelProviders.of(this).get(ShoeViewModel.class);
+        mRSHoeViewModel = ViewModelProviders.of(this).get(ShoeViewModel.class);
 
         // Configure the recycler view
         recyclerView = findViewById(R.id.recyclerView);
@@ -120,6 +119,11 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         mProgressContainer = (LinearLayout) findViewById(R.id.progress_container);
         mProgressContainer.setVisibility(View.INVISIBLE);
 
+        Bundle userInto = getIntent().getExtras();
+        userViewModel.init(userInto.getString("username"), userInto.getString("password"));
+        mLShoeViewModel.setShoe(userViewModel.getUser().getLeftShoe());
+        mRSHoeViewModel.setShoe(userViewModel.getUser().getRightShoe());
+
         Button mAccountButton = (Button) findViewById(R.id.accountButton);
         mAccountButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -129,35 +133,23 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         });
 
         //Set observer for data
-        mBlinkyViewModel.getButtonState().observe(this, data -> {
+        mLShoeViewModel.getButtonState().observe(this, data -> {
                 this.mBluetoothData.setText("" + data);
         });
 
-        mLShoeConnectButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: start new service for left shoe bluetooth
-                if((mBlinkyViewModel.isConnected().getValue() == null) || (!mBlinkyViewModel.isConnected().getValue())) {
-                    mStepsLayout.setVisibility(View.INVISIBLE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    clear();
-                    mScannerViewModel.getScannerState().observe(MainActivity.this, MainActivity.this::startScan);
-                } else {
-                    mBlinkyViewModel.disconnect();
-                    mScannerViewModel.getScannerState().removeObserver(MainActivity.this::startScan);
-                    mLShoeStatus.setTextColor(getResources().getColor(R.color.Red));
-                    mLShoeStatus.setText(getString(R.string.disconnected));
-                    mLShoeConnectButton.setText(getString(R.string.connect));
-                    // Use method to remove observer in order to get this of MainActivity
-                    removeMyObserver();
-                }
+        mLShoeConnectButton.setOnClickListener(v -> {
+            if((mLShoeViewModel.isConnected().getValue() == null) || (!mLShoeViewModel.isConnected().getValue())) {
+                onConnectShoeClick(mLShoeViewModel);
+            } else {
+                onDisconnectShoeClick(mLShoeViewModel);
             }
         });
 
-        mRShoeConnectButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: start new service for right shoe bluetooth
+        mRShoeConnectButton.setOnClickListener(v -> {
+            if((mRSHoeViewModel.isConnected().getValue() == null) || (!mRSHoeViewModel.isConnected().getValue())) {
+                onConnectShoeClick(mRSHoeViewModel);
+            } else {
+                onDisconnectShoeClick(mRSHoeViewModel);
             }
         });
 
@@ -219,16 +211,10 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     public void onItemClick(@NonNull final DiscoveredBluetoothDevice device) {
         mProgressContainer.setVisibility(View.VISIBLE);
 
-        mBlinkyViewModel.connect(device);
+        ShoeViewModel mShoeViewModel = mLShoeViewModel.isConnecting() ? mLShoeViewModel : mRSHoeViewModel;
 
-        mBlinkyViewModel.isConnected().observe(this, this::onDeviceConnectionChange);
-
-
-        //final Intent controlBlinkIntent = new Intent(this, BlinkyActivity.class);
-        //controlBlinkIntent.putExtra(BlinkyActivity.EXTRA_DEVICE, device);
-        //startActivity(controlBlinkIntent);
-
-        //TODO Start data services behind the scenes.
+        mShoeViewModel.connect(device);
+        mShoeViewModel.isConnected().observe(this, this::onDeviceConnectionChange);
     }
 
     @Override
@@ -341,31 +327,73 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         stepSummaryViewModel = ViewModelProviders.of(this, viewModelFactory).get(StepSummaryViewModel.class);
     }
 
+    /**
+     * Handles UI changes needed when initiating a connection to a Logisteps shoe and
+     * initiates the necessary Bluetooth routines
+     * @param mShoeViewModel
+     */
+    private void onConnectShoeClick(ShoeViewModel mShoeViewModel) {
+        mShoeViewModel.setConnectingStatus(true);
+        mStepsLayout.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        clear();
+
+        mScannerViewModel.getScannerState().observe(MainActivity.this, MainActivity.this::startScan);
+    }
+
+    /**
+     * Handles UI changes needed when initiating a connection to a Logisteps shoe and
+     * initiates the necessary Bluetooth routines
+     * @param mShoeViewModel
+     */
+    private void onDisconnectShoeClick(ShoeViewModel mShoeViewModel) {
+        mShoeViewModel.disconnect();
+        mScannerViewModel.getScannerState().removeObserver(MainActivity.this::startScan);
+    }
+
     private void onDeviceConnectionChange(final boolean connected) {
+        ShoeViewModel mShoeViewModel = mLShoeViewModel.isConnecting() ? mLShoeViewModel : mRSHoeViewModel;
+
         if(connected) {
-            // Connected to device user selected
-            // Turn progress/recycler invisible
-            // Show steps
-            // Change connection status
             mProgressContainer.setVisibility(View.INVISIBLE);
             recyclerView.setVisibility(View.INVISIBLE);
             mStepsLayout.setVisibility(View.VISIBLE);
+
+            setShoeConnected(mShoeViewModel);
+
+        } else {
+            setShoeDisconnected(mShoeViewModel);
+        }
+    }
+
+    private void setShoeConnected(ShoeViewModel mShoeViewModel) {
+        if(mShoeViewModel.getShoe().getFoot().equals("left")) {
             mLShoeStatus.setText(getString(R.string.connected));
             mLShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Green));
             mLShoeConnectButton.setText(getString(R.string.disconnect));
         } else {
-            // Disconnected from device
-            // Change connection status
-            // Remove observer
-            mLShoeStatus.setText(getString(R.string.disconnected));
-            mLShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Red));
-            mLShoeConnectButton.setText(getString(R.string.connect));
-            mBlinkyViewModel.isConnected().removeObserver(this::onDeviceConnectionChange);
-
+            mRShoeStatus.setText(getString(R.string.connected));
+            mRShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Green));
+            mRShoeConnectButton.setText(getString(R.string.disconnect));
         }
     }
 
-    private void removeMyObserver() {
-        mBlinkyViewModel.isConnected().removeObserver(this::onDeviceConnectionChange);
+    private void setShoeDisconnected(ShoeViewModel mShoeViewModel) {
+        if(mShoeViewModel.getShoe().getFoot().equals("left")) {
+            mLShoeStatus.setText(getString(R.string.disconnected));
+            mLShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Red));
+            mLShoeConnectButton.setText(getString(R.string.connect));
+            mShoeViewModel.isConnected().removeObserver(this::onDeviceConnectionChange);
+        } else {
+            mRShoeStatus.setText(getString(R.string.disconnected));
+            mRShoeStatus.setTextColor(ContextCompat.getColor(this,R.color.Red));
+            mRShoeConnectButton.setText(getString(R.string.connect));
+            mShoeViewModel.isConnected().removeObserver(this::onDeviceConnectionChange);
+        }
     }
+
+//    private void removeMyObserver() {
+//        mLShoeViewModel.isConnected().removeObserver(this::onDeviceConnectionChange);
+//    }
 }

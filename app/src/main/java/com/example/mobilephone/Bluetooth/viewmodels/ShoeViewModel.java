@@ -31,6 +31,7 @@ import android.bluetooth.BluetoothDevice;
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
 import com.example.mobilephone.Bluetooth.profile.BlinkyManager;
 import com.example.mobilephone.Bluetooth.profile.BlinkyManagerCallbacks;
+import com.example.mobilephone.Models.Shoe;
 import com.example.mobilephone.R;
 
 import androidx.annotation.NonNull;
@@ -38,9 +39,12 @@ import androidx.annotation.NonNull;
 import no.nordicsemi.android.log.LogSession;
 import no.nordicsemi.android.log.Logger;
 
-public class BlinkyViewModel extends AndroidViewModel implements BlinkyManagerCallbacks {
+public class ShoeViewModel extends AndroidViewModel implements BlinkyManagerCallbacks {
 	private final BlinkyManager mBlinkyManager;
 	private BluetoothDevice mDevice;
+	private Shoe shoe;
+
+	private boolean isConnecting = false;
 
 	// Connection states Connecting, Connected, Disconnecting, Disconnected etc.
 	private final MutableLiveData<String> mConnectionState = new MutableLiveData<>();
@@ -85,7 +89,7 @@ public class BlinkyViewModel extends AndroidViewModel implements BlinkyManagerCa
 		return mIsSupported;
 	}
 
-	public BlinkyViewModel(@NonNull final Application application) {
+	public ShoeViewModel(@NonNull final Application application) {
 		super(application);
 
 		// Initialize the manager
@@ -217,4 +221,21 @@ public class BlinkyViewModel extends AndroidViewModel implements BlinkyManagerCa
 		mConnectionState.postValue(null);
 		mIsSupported.postValue(false);
 	}
+
+	public void setShoe(Shoe shoe) {
+	    if (shoe != null)
+	        this.shoe = shoe;
+    }
+
+    public Shoe getShoe() {
+	    return this.shoe;
+    }
+
+    public void setConnectingStatus(boolean b) {
+	    this.isConnecting = b;
+    }
+
+    public boolean isConnecting() {
+	    return this.isConnecting;
+    }
 }

@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.mobilephone.Activities.MainActivity;
-import com.example.mobilephone.Bluetooth.ScannerActivity;
 import com.example.mobilephone.Bluetooth.viewmodels.DevicesLiveData;
 import com.example.mobilephone.R;
 
