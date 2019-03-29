@@ -26,7 +26,7 @@ import androidx.lifecycle.LiveData;
 import android.os.ParcelUuid;
 
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
-import com.example.mobilephone.Bluetooth.profile.BlinkyManager;
+import com.example.mobilephone.Bluetooth.profile.LogistepsManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ import no.nordicsemi.android.support.v18.scanner.ScanResult;
  */
 @SuppressWarnings("unused")
 public class DevicesLiveData extends LiveData<List<DiscoveredBluetoothDevice>> {
-	private static final ParcelUuid FILTER_UUID = new ParcelUuid(BlinkyManager.LBS_UUID_SERVICE);
+	private static final ParcelUuid FILTER_UUID = new ParcelUuid(LogistepsManager.LOGISTEPS_UUID_SERVICE);
 	private static final int FILTER_RSSI = -50; // [dBm]
 
 	private final List<DiscoveredBluetoothDevice> mDevices = new ArrayList<>();

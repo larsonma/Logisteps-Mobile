@@ -20,19 +20,13 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.example.mobilephone.Bluetooth.profile.callback;
+package com.example.mobilephone.Bluetooth.profile;
 
-import android.bluetooth.BluetoothDevice;
+import com.example.mobilephone.Bluetooth.profile.callback.LogistepsSensorCallback;
 
-import androidx.annotation.NonNull;
+import no.nordicsemi.android.ble.BleManagerCallbacks;
 
-public interface BlinkyButtonCallback {
-
-    /**
-     * Called when a button was pressed or released on device.
-     *
-     * @param device the target device.
-     * @param pressed true if the button was pressed, false if released.
-     */
-    void onButtonStateChanged(@NonNull final BluetoothDevice device, final int pressed);
+public interface LogistepsManagerCallbacks extends BleManagerCallbacks,
+		LogistepsSensorCallback {
+	// No more methods
 }

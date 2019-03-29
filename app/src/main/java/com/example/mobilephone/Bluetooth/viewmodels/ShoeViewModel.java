@@ -29,18 +29,20 @@ import androidx.lifecycle.MutableLiveData;
 import android.bluetooth.BluetoothDevice;
 
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
-import com.example.mobilephone.Bluetooth.profile.BlinkyManager;
-import com.example.mobilephone.Bluetooth.profile.BlinkyManagerCallbacks;
+import com.example.mobilephone.Bluetooth.profile.LogistepsManager;
+import com.example.mobilephone.Bluetooth.profile.LogistepsManagerCallbacks;
 import com.example.mobilephone.Models.Shoe;
 import com.example.mobilephone.R;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 
 import no.nordicsemi.android.log.LogSession;
 import no.nordicsemi.android.log.Logger;
 
-public class ShoeViewModel extends AndroidViewModel implements BlinkyManagerCallbacks {
-	private final BlinkyManager mBlinkyManager;
+public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerCallbacks {
+	private final LogistepsManager mLogistepsManager;
 	private BluetoothDevice mDevice;
 	private Shoe shoe;
 
@@ -93,8 +95,8 @@ public class ShoeViewModel extends AndroidViewModel implements BlinkyManagerCall
 		super(application);
 
 		// Initialize the manager
-		mBlinkyManager = new BlinkyManager(getApplication());
-		mBlinkyManager.setGattCallbacks(this);
+		mLogistepsManager = new LogistepsManager(getApplication());
+		mLogistepsManager.setGattCallbacks(this);
 	}
 
 	/**
@@ -106,7 +108,7 @@ public class ShoeViewModel extends AndroidViewModel implements BlinkyManagerCall
 			mDevice = device.getDevice();
 			final LogSession logSession
 					= Logger.newSession(getApplication(), null, device.getAddress(), device.getName());
-			mBlinkyManager.setLogger(logSession);
+			mLogistepsManager.setLogger(logSession);
 			reconnect();
 		}
 	}
@@ -118,7 +120,7 @@ public class ShoeViewModel extends AndroidViewModel implements BlinkyManagerCall
 	 */
 	public void reconnect() {
 		if (mDevice != null) {
-			mBlinkyManager.connect(mDevice)
+			mLogistepsManager.connect(mDevice)
 					.retry(3, 100)
 					.useAutoConnect(false)
 					.enqueue();
@@ -130,31 +132,22 @@ public class ShoeViewModel extends AndroidViewModel implements BlinkyManagerCall
 	 */
 	public void disconnect() {
 		mDevice = null;
-		mBlinkyManager.disconnect().enqueue();
+		mLogistepsManager.disconnect().enqueue();
 	}
 
-	public void toggleLED(final boolean isOn) {
-		mBlinkyManager.send(isOn);
-		mLEDState.setValue(isOn);
-	}
 
 	@Override
 	protected void onCleared() {
 		super.onCleared();
-		if (mBlinkyManager.isConnected()) {
+		if (mLogistepsManager.isConnected()) {
 			disconnect();
 		}
 	}
 
-	@Override
-	public void onButtonStateChanged(@NonNull final BluetoothDevice device, final int data) {
-		mButtonState.postValue(data);
-	}
-
-	@Override
-	public void onLedStateChanged(@NonNull final BluetoothDevice device, final boolean on) {
-		mLEDState.postValue(on);
-	}
+    @Override
+    public void onSensorDataRecieved(@NonNull BluetoothDevice device, List<Integer> sensorReadings) {
+        //TODO: Do something when data is received. Maybe not?
+    }
 
 	@Override
 	public void onDeviceConnecting(@NonNull final BluetoothDevice device) {
@@ -238,4 +231,5 @@ public class ShoeViewModel extends AndroidViewModel implements BlinkyManagerCall
     public boolean isConnecting() {
 	    return this.isConnecting;
     }
+
 }
