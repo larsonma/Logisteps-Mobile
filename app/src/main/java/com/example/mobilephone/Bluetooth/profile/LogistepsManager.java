@@ -31,13 +31,25 @@ import android.util.Log;
 
 import com.example.mobilephone.Bluetooth.profile.callback.LogistepsSensorDataCallback;
 import com.example.mobilephone.Bluetooth.profile.data.Step;
+import com.example.mobilephone.Bluetooth.viewmodels.ShoeViewModel;
+import com.example.mobilephone.Databases.StepSummaryDao;
+import com.example.mobilephone.Models.Location;
+import com.example.mobilephone.Models.SensorReading;
+import com.example.mobilephone.Services.LogistepsService;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import javax.inject.Inject;
 
 import no.nordicsemi.android.ble.BleManager;
 import no.nordicsemi.android.ble.data.Data;
@@ -57,10 +69,14 @@ public class LogistepsManager extends BleManager<LogistepsManagerCallbacks> {
 	private ArrayList<Step> mStepList;
 	private LogSession mLogSession;
 	private boolean mSupported;
+	private ShoeViewModel mShoeViewModel;
 
-	public LogistepsManager(@NonNull final Context context) {
+
+    @Inject
+	public LogistepsManager(@NonNull final Context context, ShoeViewModel mShoeViewModel) {
 		super(context);
-	}
+        this.mShoeViewModel = mShoeViewModel;
+    }
 
 	@NonNull
 	@Override
@@ -95,6 +111,15 @@ public class LogistepsManager extends BleManager<LogistepsManagerCallbacks> {
         @Override
         public void onSensorDataRecieved(@NonNull BluetoothDevice device, List<Integer> sensorReadings) {
             //TODO: Create a step object and push to the stepList
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
+            String datetime = sdf.format(new Date());
+
+            ArrayList<SensorReading> sensorReadingsList = new ArrayList<>();
+            for (int i = 0; i < sensorReadings.size(); i++ ){
+                sensorReadingsList.add(new SensorReading("T", sensorReadings.get(i)));
+            }
+
+            mShoeViewModel.postSteps(datetime, sensorReadingsList, new Location(178.92323, -9.23422));
         }
 
         @Override
@@ -120,48 +145,6 @@ public class LogistepsManager extends BleManager<LogistepsManagerCallbacks> {
             log(Log.WARN, "Invalid data received: " + data);
         }
     };
-
-//	private	final BlinkyButtonDataCallback mButtonCallback = new BlinkyButtonDataCallback() {
-//		@Override
-//		public void onButtonStateChanged(@NonNull final BluetoothDevice device,
-//										 final int data) {
-//			mCallbacks.onButtonStateChanged(device, data);
-//		}
-//
-//		@Override
-//		public void onInvalidDataReceived(@NonNull final BluetoothDevice device,
-//										  @NonNull final Data data) {
-//			log(Log.WARN, "Invalid data received: " + data);
-//		}
-//	};
-
-	/**
-	 * The LED callback will be notified when the LED state was read or sent to the target device.
-	 * <p>
-	 * This callback implements both {@link no.nordicsemi.android.ble.callback.DataReceivedCallback}
-	 * and {@link no.nordicsemi.android.ble.callback.DataSentCallback} and calls the same
-	 * method on success.
-	 * <p>
-	 * If the data received were invalid, the
-	 * {@link BlinkyLedDataCallback#onInvalidDataReceived(BluetoothDevice, Data)} will be
-	 * called.
-	 */
-//	private final BlinkyLedDataCallback mLedCallback = new BlinkyLedDataCallback() {
-//		@Override
-//		public void onLedStateChanged(@NonNull final BluetoothDevice device,
-//									  final boolean on) {
-//			mLedOn = on;
-//			log(LogContract.Log.Level.APPLICATION, "LED " + (on ? "ON" : "OFF"));
-//			mCallbacks.onLedStateChanged(device, on);
-//		}
-//
-//		@Override
-//		public void onInvalidDataReceived(@NonNull final BluetoothDevice device,
-//										  @NonNull final Data data) {
-//			// Data can only invalid if we read them. We assume the app always sends correct data.
-//			log(Log.WARN, "Invalid data received: " + data);
-//		}
-//	};
 
 	/**
 	 * BluetoothGatt callbacks object.

@@ -22,19 +22,35 @@
 
 package com.example.mobilephone.Bluetooth.viewmodels;
 
+import android.Manifest;
 import android.app.Application;
+
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
 import com.example.mobilephone.Bluetooth.profile.LogistepsManager;
 import com.example.mobilephone.Bluetooth.profile.LogistepsManagerCallbacks;
+import com.example.mobilephone.Bluetooth.profile.data.Step;
+import com.example.mobilephone.Models.SensorReading;
 import com.example.mobilephone.Models.Shoe;
+import com.example.mobilephone.Models.User;
 import com.example.mobilephone.R;
+import com.example.mobilephone.Repositories.StepRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
@@ -44,7 +60,13 @@ import no.nordicsemi.android.log.Logger;
 public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerCallbacks {
 	private final LogistepsManager mLogistepsManager;
 	private BluetoothDevice mDevice;
+	private StepRepository stepRepository;
+	private Location lastLocation;
 	private Shoe shoe;
+	private User user;
+
+	private final long MIN_UPDATE_TIME = 1000;
+	private final float MIN_UPDATE_DISTANCE = 5;
 
 	private boolean isConnecting = false;
 
@@ -66,6 +88,30 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 	// Flag that holds the pressed released state of the button on the devkit.
 	// Pressed is true, Released is false
 	private final MutableLiveData<Integer> mButtonState = new MutableLiveData<>();
+
+//	private LocationManager mLocationManager;
+//
+//	private final LocationListener mLocationListener = new LocationListener() {
+//		@Override
+//		public void onLocationChanged(Location location) {
+//			ShoeViewModel.this.lastLocation = location;
+//		}
+//
+//		@Override
+//		public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//		}
+//
+//		@Override
+//		public void onProviderEnabled(String provider) {
+//
+//		}
+//
+//		@Override
+//		public void onProviderDisabled(String provider) {
+//
+//		}
+//	};
 
 	public LiveData<Void> isDeviceReady() {
 		return mOnDeviceReady;
@@ -91,12 +137,29 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		return mIsSupported;
 	}
 
-	public ShoeViewModel(@NonNull final Application application) {
+	@Inject
+	public ShoeViewModel(@NonNull final Application application, StepRepository stepRepository) {
 		super(application);
 
 		// Initialize the manager
-		mLogistepsManager = new LogistepsManager(getApplication());
+		mLogistepsManager = new LogistepsManager(getApplication(), this);
 		mLogistepsManager.setGattCallbacks(this);
+		this.stepRepository = stepRepository;
+
+//		mLocationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
+//		if (application.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+//				&& application.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//			// TODO: Consider calling
+//			//    Activity#requestPermissions
+//			// here to request the missing permissions, and then overriding
+//			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//			//                                          int[] grantResults)
+//			// to handle the case where the user grants the permission. See the documentation
+//			// for Activity#requestPermissions for more details.
+//			//return TODO;
+//		}
+//		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_UPDATE_TIME,
+//				MIN_UPDATE_DISTANCE, mLocationListener);
 	}
 
 	/**
@@ -134,6 +197,17 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		mDevice = null;
 		mLogistepsManager.disconnect().enqueue();
 	}
+
+	public void setUser(User user) {
+	    this.user = user;
+    }
+
+	public void postSteps(String datetime, List<SensorReading> readings, com.example.mobilephone.Models.Location location) {
+        List<Step> steps = new ArrayList<>();
+
+        steps.add(new Step(datetime, shoe.getFoot(), readings, location));
+        stepRepository.postSteps(steps, user);
+    }
 
 
 	@Override
@@ -216,8 +290,9 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 	}
 
 	public void setShoe(Shoe shoe) {
-	    if (shoe != null)
-	        this.shoe = shoe;
+	    if (shoe != null) {
+            this.shoe = shoe;
+        }
     }
 
     public Shoe getShoe() {

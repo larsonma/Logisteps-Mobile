@@ -12,18 +12,20 @@ import no.nordicsemi.android.ble.data.Data;
 
 @SuppressWarnings("ConstantConditions")
 public abstract class LogistepsSensorDataCallback implements ProfileDataCallback, LogistepsSensorCallback {
+    private final int SENSOR_READINGS = 15;
 
     @Override
     public void onDataReceived(@NonNull final BluetoothDevice device, @NonNull final Data data) {
-        if (data.size() != 2) {
+        if (data.size() != SENSOR_READINGS) {
             onInvalidDataReceived(device, data);
             return;
         }
 
         ArrayList<Integer> sensorReadings = new ArrayList<>();
 
-        sensorReadings.add(data.getIntValue(Data.FORMAT_UINT16, 0));
-        sensorReadings.add(data.getIntValue(Data.FORMAT_UINT16, 2));
+        for (int i = 0; i < SENSOR_READINGS; i++) {
+            sensorReadings.add(data.getIntValue(Data.FORMAT_SINT8, i));
+        }
         onSensorDataRecieved(device, sensorReadings);
     }
 }

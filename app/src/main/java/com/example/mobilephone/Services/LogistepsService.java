@@ -1,7 +1,10 @@
 package com.example.mobilephone.Services;
 
+import com.example.mobilephone.Bluetooth.profile.data.Step;
 import com.example.mobilephone.Models.StepSummary;
 import com.example.mobilephone.Models.User;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -19,4 +22,7 @@ public interface LogistepsService {
 
     @GET("steps/summary/")
     Call<StepSummary> getStepSummary(@Header("Authorization") String credentials);
+
+    @POST("steps/")
+    Call<List<Step>> postSteps(@Header("Authorization") String credentials, @Body List<Step> steps);
 }

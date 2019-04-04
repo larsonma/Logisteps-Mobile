@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         userViewModel.init(userInto.getString("username"), userInto.getString("password"));
         mLShoeViewModel.setShoe(userViewModel.getUser().getLeftShoe());
         mRSHoeViewModel.setShoe(userViewModel.getUser().getRightShoe());
+        mLShoeViewModel.setUser(userViewModel.getUser());
+        mRSHoeViewModel.setUser(userViewModel.getUser());
 
         Button mAccountButton = (Button) findViewById(R.id.accountButton);
         mAccountButton.setOnClickListener(new OnClickListener() {
