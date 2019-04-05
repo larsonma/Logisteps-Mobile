@@ -46,9 +46,13 @@ import com.example.mobilephone.Models.Shoe;
 import com.example.mobilephone.Models.User;
 import com.example.mobilephone.R;
 import com.example.mobilephone.Repositories.StepRepository;
+import com.example.mobilephone.Services.LogistepsService;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
@@ -56,6 +60,10 @@ import androidx.annotation.NonNull;
 
 import no.nordicsemi.android.log.LogSession;
 import no.nordicsemi.android.log.Logger;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerCallbacks {
 	private final LogistepsManager mLogistepsManager;
@@ -137,15 +145,24 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		return mIsSupported;
 	}
 
-	@Inject
-	public ShoeViewModel(@NonNull final Application application, StepRepository stepRepository) {
+	public ShoeViewModel(@NonNull final Application application) {
 		super(application);
 
 		// Initialize the manager
 		mLogistepsManager = new LogistepsManager(getApplication(), this);
 		mLogistepsManager.setGattCallbacks(this);
-		this.stepRepository = stepRepository;
 
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().create()))
+                .baseUrl("https://senior-design-1549134040092.appspot.com/api/")
+                .client(client)
+                .build();
+
+		this.stepRepository = new StepRepository(retrofit.create(LogistepsService.class), Executors.newSingleThreadExecutor());
 //		mLocationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
 //		if (application.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
 //				&& application.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -281,6 +298,7 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 	public void onError(@NonNull final BluetoothDevice device,
 						@NonNull final String message, final int errorCode) {
 		// TODO implement
+        if (errorCode == 0) ;
 	}
 
 	@Override

@@ -119,6 +119,9 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
         mProgressContainer = (LinearLayout) findViewById(R.id.progress_container);
         mProgressContainer.setVisibility(View.INVISIBLE);
 
+        this.configureDagger();
+        this.configureViewModel();
+
         Bundle userInto = getIntent().getExtras();
         userViewModel.init(userInto.getString("username"), userInto.getString("password"));
         mLShoeViewModel.setShoe(userViewModel.getUser().getLeftShoe());

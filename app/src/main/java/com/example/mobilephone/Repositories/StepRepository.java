@@ -13,21 +13,21 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import okhttp3.Credentials;
 import retrofit2.Response;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
+@Singleton
 public class StepRepository {
     private final LogistepsService webservice;
-    private final StepSummaryDao stepSummaryDao;
     private final Executor executor;
 
     @Inject
-    public StepRepository(LogistepsService webservice, StepSummaryDao stepSummaryDao, Executor executor) {
+    public StepRepository(LogistepsService webservice, Executor executor) {
         this.webservice = webservice;
-        this.stepSummaryDao = stepSummaryDao;
         this.executor = executor;
     }
 
