@@ -58,6 +58,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
+import dagger.Provides;
 import no.nordicsemi.android.log.LogSession;
 import no.nordicsemi.android.log.Logger;
 import okhttp3.OkHttpClient;
@@ -68,7 +69,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerCallbacks {
 	private final LogistepsManager mLogistepsManager;
 	private BluetoothDevice mDevice;
-	private StepRepository stepRepository;
+	@Inject StepRepository stepRepository;
 	private Location lastLocation;
 	private Shoe shoe;
 	private User user;
@@ -145,6 +146,7 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		return mIsSupported;
 	}
 
+	@Inject
 	public ShoeViewModel(@NonNull final Application application) {
 		super(application);
 
@@ -152,17 +154,6 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		mLogistepsManager = new LogistepsManager(getApplication(), this);
 		mLogistepsManager.setGattCallbacks(this);
 
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().create()))
-                .baseUrl("https://senior-design-1549134040092.appspot.com/api/")
-                .client(client)
-                .build();
-
-		this.stepRepository = new StepRepository(retrofit.create(LogistepsService.class), Executors.newSingleThreadExecutor());
 //		mLocationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
 //		if (application.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
 //				&& application.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

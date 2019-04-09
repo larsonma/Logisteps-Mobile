@@ -26,5 +26,10 @@ public abstract class ViewModelModule {
     abstract ViewModel bindUserViewModel (UserViewModel userViewModel);
 
     @Binds
+    @IntoMap
+    @ViewModelKey(ShoeViewModel.class)
+    abstract ViewModel bindShoeViewModel (ShoeViewModel shoeViewModel);
+
+    @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(FactoryViewModel factory);
 }

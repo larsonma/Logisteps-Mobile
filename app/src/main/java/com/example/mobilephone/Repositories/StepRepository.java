@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import dagger.Provides;
 import okhttp3.Credentials;
 import retrofit2.Response;
 

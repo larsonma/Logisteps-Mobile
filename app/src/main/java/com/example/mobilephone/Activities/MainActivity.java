@@ -92,8 +92,6 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
 
         // Create viewModels for handling Bluetooth actions
         mScannerViewModel = ViewModelProviders.of(this).get(ScannerViewModel.class);
-        mLShoeViewModel = ViewModelProviders.of(this).get(ShoeViewModel.class);
-        mRSHoeViewModel = ViewModelProviders.of(this).get(ShoeViewModel.class);
 
         // Configure the recycler view
         recyclerView = findViewById(R.id.recyclerView);
@@ -330,6 +328,8 @@ public class MainActivity extends AppCompatActivity implements DevicesAdapter.On
     private void configureViewModel() {
         userViewModel = ViewModelProviders.of(this, viewModelFactory).get(UserViewModel.class);
         stepSummaryViewModel = ViewModelProviders.of(this, viewModelFactory).get(StepSummaryViewModel.class);
+        mLShoeViewModel = ViewModelProviders.of(this, viewModelFactory).get(ShoeViewModel.class);
+        mRSHoeViewModel = ViewModelProviders.of(this, viewModelFactory).get(ShoeViewModel.class);
     }
 
     /**
