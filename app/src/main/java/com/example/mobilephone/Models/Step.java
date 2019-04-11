@@ -1,5 +1,5 @@
 
-package com.example.mobilephone.Bluetooth.profile.data;
+package com.example.mobilephone.Models;
 
 import com.example.mobilephone.Models.Location;
 import com.example.mobilephone.Models.SensorReading;

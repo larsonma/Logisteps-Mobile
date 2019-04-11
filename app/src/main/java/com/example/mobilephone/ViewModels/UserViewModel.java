@@ -56,7 +56,6 @@ public class UserViewModel extends ViewModel {
         return this.user;
     }
 
-
     public boolean authenticateUser(String username, String password) {
         boolean result = false;
         try {

@@ -22,7 +22,6 @@
 
 package com.example.mobilephone.Bluetooth.viewmodels;
 
-import android.Manifest;
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
@@ -30,41 +29,27 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
 import com.example.mobilephone.Bluetooth.profile.LogistepsManager;
 import com.example.mobilephone.Bluetooth.profile.LogistepsManagerCallbacks;
-import com.example.mobilephone.Bluetooth.profile.data.Step;
+import com.example.mobilephone.Models.Step;
 import com.example.mobilephone.Models.SensorReading;
 import com.example.mobilephone.Models.Shoe;
 import com.example.mobilephone.Models.User;
 import com.example.mobilephone.R;
 import com.example.mobilephone.Repositories.StepRepository;
-import com.example.mobilephone.Services.LogistepsService;
-import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 
-import dagger.Provides;
 import no.nordicsemi.android.log.LogSession;
 import no.nordicsemi.android.log.Logger;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerCallbacks {
 	private final LogistepsManager mLogistepsManager;

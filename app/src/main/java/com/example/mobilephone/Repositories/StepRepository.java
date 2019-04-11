@@ -2,20 +2,17 @@ package com.example.mobilephone.Repositories;
 
 import android.util.Log;
 
-import com.example.mobilephone.Bluetooth.profile.data.Step;
-import com.example.mobilephone.Databases.StepSummaryDao;
+import com.example.mobilephone.Models.Step;
 import com.example.mobilephone.Models.User;
 import com.example.mobilephone.Services.LogistepsService;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import dagger.Provides;
 import okhttp3.Credentials;
 import retrofit2.Response;
 

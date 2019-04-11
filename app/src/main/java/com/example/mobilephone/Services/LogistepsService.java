@@ -1,6 +1,6 @@
 package com.example.mobilephone.Services;
 
-import com.example.mobilephone.Bluetooth.profile.data.Step;
+import com.example.mobilephone.Models.Step;
 import com.example.mobilephone.Models.StepSummary;
 import com.example.mobilephone.Models.User;
 

@@ -30,12 +30,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.mobilephone.Bluetooth.profile.callback.LogistepsSensorDataCallback;
-import com.example.mobilephone.Bluetooth.profile.data.Step;
+import com.example.mobilephone.Models.Step;
 import com.example.mobilephone.Bluetooth.viewmodels.ShoeViewModel;
-import com.example.mobilephone.Databases.StepSummaryDao;
 import com.example.mobilephone.Models.Location;
 import com.example.mobilephone.Models.SensorReading;
-import com.example.mobilephone.Services.LogistepsService;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,8 +44,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 
