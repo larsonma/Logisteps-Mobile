@@ -29,6 +29,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
@@ -40,9 +42,11 @@ import com.example.mobilephone.Models.Shoe;
 import com.example.mobilephone.Models.User;
 import com.example.mobilephone.R;
 import com.example.mobilephone.Repositories.StepRepository;
+import com.example.mobilephone.Repositories.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -55,9 +59,11 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 	private final LogistepsManager mLogistepsManager;
 	private BluetoothDevice mDevice;
 	@Inject StepRepository stepRepository;
+	@Inject	UserRepository userRepository;
 	private Location lastLocation;
 	private Shoe shoe;
-	private User user;
+
+	private SharedPreferences sharedPreferences;
 
 	private final long MIN_UPDATE_TIME = 1000;
 	private final float MIN_UPDATE_DISTANCE = 5;
@@ -135,6 +141,8 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 	public ShoeViewModel(@NonNull final Application application) {
 		super(application);
 
+		sharedPreferences = application.getSharedPreferences("userCredentials", Context.MODE_PRIVATE);
+
 		// Initialize the manager
 		mLogistepsManager = new LogistepsManager(getApplication(), this);
 		mLogistepsManager.setGattCallbacks(this);
@@ -191,15 +199,22 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		mLogistepsManager.disconnect().enqueue();
 	}
 
-	public void setUser(User user) {
-	    this.user = user;
-    }
-
 	public void postSteps(String datetime, List<SensorReading> readings, com.example.mobilephone.Models.Location location) {
         List<Step> steps = new ArrayList<>();
 
-        steps.add(new Step(datetime, shoe.getFoot(), readings, location));
-        stepRepository.postSteps(steps, user);
+		try {
+			User currentUser = userRepository.getUser(
+					sharedPreferences.getString("username", ""),
+					sharedPreferences.getString("password", "")
+			);
+
+			steps.add(new Step(datetime, shoe.getFoot(), readings, location));
+			stepRepository.postSteps(steps, currentUser);
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
     }
 
 
