@@ -30,8 +30,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.mobilephone.Bluetooth.profile.callback.LogistepsSensorDataCallback;
+import com.example.mobilephone.Managers.StepManager;
 import com.example.mobilephone.Models.Step;
-import com.example.mobilephone.Bluetooth.viewmodels.ShoeViewModel;
 import com.example.mobilephone.Models.Location;
 import com.example.mobilephone.Models.SensorReading;
 
@@ -65,13 +65,13 @@ public class LogistepsManager extends BleManager<LogistepsManagerCallbacks> {
 	private ArrayList<Step> mStepList;
 	private LogSession mLogSession;
 	private boolean mSupported;
-	private ShoeViewModel mShoeViewModel;
+	private StepManager mStepManager;
 
 
     @Inject
-	public LogistepsManager(@NonNull final Context context, ShoeViewModel mShoeViewModel) {
+	public LogistepsManager(@NonNull final Context context, StepManager stepManager) {
 		super(context);
-        this.mShoeViewModel = mShoeViewModel;
+        this.mStepManager = stepManager;
     }
 
 	@NonNull
@@ -106,16 +106,12 @@ public class LogistepsManager extends BleManager<LogistepsManagerCallbacks> {
 	private final LogistepsSensorDataCallback mTopSensorCallback = new LogistepsSensorDataCallback() {
         @Override
         public void onSensorDataRecieved(@NonNull BluetoothDevice device, List<Integer> sensorReadings) {
-            //TODO: Create a step object and push to the stepList
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
-            String datetime = sdf.format(new Date());
-
             ArrayList<SensorReading> sensorReadingsList = new ArrayList<>();
             for (int i = 0; i < sensorReadings.size(); i++ ){
                 sensorReadingsList.add(new SensorReading("T", sensorReadings.get(i)));
             }
 
-            mShoeViewModel.postSteps(datetime, sensorReadingsList, new Location(178.92323, -9.23422));
+            mStepManager.addTopSensorReadings(sensorReadingsList);
         }
 
         @Override
@@ -132,7 +128,12 @@ public class LogistepsManager extends BleManager<LogistepsManagerCallbacks> {
 	private final LogistepsSensorDataCallback mBottomSensorCallback = new LogistepsSensorDataCallback() {
         @Override
         public void onSensorDataRecieved(@NonNull BluetoothDevice device, List<Integer> sensorReadings) {
-            //TODO: Create a step object and push to the stepList
+            ArrayList<SensorReading> sensorReadingsList = new ArrayList<>();
+            for (int i = 0; i < sensorReadings.size(); i++) {
+                sensorReadingsList.add(new SensorReading("B", sensorReadings.get(i)));
+            }
+
+            mStepManager.addBottomSensorReadings(sensorReadingsList);
         }
 
         @Override

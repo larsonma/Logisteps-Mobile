@@ -36,6 +36,8 @@ import android.location.Location;
 import com.example.mobilephone.Bluetooth.adapter.DiscoveredBluetoothDevice;
 import com.example.mobilephone.Bluetooth.profile.LogistepsManager;
 import com.example.mobilephone.Bluetooth.profile.LogistepsManagerCallbacks;
+import com.example.mobilephone.Managers.OnStepCreatedEventListener;
+import com.example.mobilephone.Managers.StepManager;
 import com.example.mobilephone.Models.Step;
 import com.example.mobilephone.Models.SensorReading;
 import com.example.mobilephone.Models.Shoe;
@@ -60,7 +62,9 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 	private BluetoothDevice mDevice;
 	@Inject StepRepository stepRepository;
 	@Inject	UserRepository userRepository;
+	private StepManager stepManager;
 	private Location lastLocation;
+	private ArrayList<Step> steps;
 	private Shoe shoe;
 
 	private SharedPreferences sharedPreferences;
@@ -143,9 +147,20 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 
 		sharedPreferences = application.getSharedPreferences("userCredentials", Context.MODE_PRIVATE);
 
-		// Initialize the manager
-		mLogistepsManager = new LogistepsManager(getApplication(), this);
-		mLogistepsManager.setGattCallbacks(this);
+		steps = new ArrayList<>();
+
+		//Create step manager. Collects sensor readings and creates steps
+        stepManager = new StepManager();
+        stepManager.setOnStepCreatedEventListener(step -> {
+            steps.add(step);
+            if(steps.size() == 10) {
+                postSteps();
+            }
+        });
+
+        // Initialize the manager
+        mLogistepsManager = new LogistepsManager(getApplication(), stepManager);
+        mLogistepsManager.setGattCallbacks(this);
 
 //		mLocationManager = (LocationManager) application.getSystemService(Context.LOCATION_SERVICE);
 //		if (application.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -199,23 +214,39 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		mLogistepsManager.disconnect().enqueue();
 	}
 
-	public void postSteps(String datetime, List<SensorReading> readings, com.example.mobilephone.Models.Location location) {
-        List<Step> steps = new ArrayList<>();
+    public void postSteps() {
+        try {
+            User currentUser = userRepository.getUser(
+                    sharedPreferences.getString("username", ""),
+                    sharedPreferences.getString("password", "")
+            );
 
-		try {
-			User currentUser = userRepository.getUser(
-					sharedPreferences.getString("username", ""),
-					sharedPreferences.getString("password", "")
-			);
-
-			steps.add(new Step(datetime, shoe.getFoot(), readings, location));
-			stepRepository.postSteps(steps, currentUser);
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+            stepRepository.postSteps(steps, currentUser);
+            steps.clear();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
+
+//	public void postSteps(String datetime, List<SensorReading> readings, com.example.mobilephone.Models.Location location) {
+//        List<Step> steps = new ArrayList<>();
+//
+//		try {
+//			User currentUser = userRepository.getUser(
+//					sharedPreferences.getString("username", ""),
+//					sharedPreferences.getString("password", "")
+//			);
+//
+//			steps.add(new Step(datetime, shoe.getFoot(), readings, location));
+//			stepRepository.postSteps(steps, currentUser);
+//		} catch (ExecutionException e) {
+//			e.printStackTrace();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//    }
 
 
 	@Override
