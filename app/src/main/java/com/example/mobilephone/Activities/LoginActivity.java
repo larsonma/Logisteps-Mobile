@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -128,11 +129,18 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startMainActivity(String username, String password) {
-        finish();
+        SharedPreferences userSession = getSharedPreferences("userCredentials", MODE_PRIVATE);
+        SharedPreferences.Editor editor = userSession.edit();
+        editor.putString("username", username);
+        editor.putString("password", password);
+        editor.commit();
+
         Intent mainActivityIntent = new Intent(LoginActivity.this, MainActivity.class);
-        mainActivityIntent.putExtra("username", username);
-        mainActivityIntent.putExtra("password", password);
+//        mainActivityIntent.putExtra("username", username);
+//        mainActivityIntent.putExtra("password", password);
         LoginActivity.this.startActivity(mainActivityIntent);
+
+        finish();
     }
 
     /**

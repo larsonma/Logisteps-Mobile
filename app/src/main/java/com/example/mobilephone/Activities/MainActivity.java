@@ -2,6 +2,7 @@ package com.example.mobilephone.Activities;
 
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private StepSummaryViewModel stepSummaryViewModel;
     private UserViewModel userViewModel;
 
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +77,12 @@ public class MainActivity extends AppCompatActivity {
         this.configureDagger();
         this.configureViewModel();
 
-        Bundle userInto = getIntent().getExtras();
-        userViewModel.init(userInto.getString("username"), userInto.getString("password"));
-        stepSummaryViewModel.init(userViewModel.getUser(), 0);
+        sharedPreferences = getSharedPreferences("userCredentials", MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "");
+        String password = sharedPreferences.getString("password", "");
+
+        userViewModel.init(username, password);
+        stepSummaryViewModel.init();
         stepSummaryViewModel.getStepSummary().observe(this, stepSummary -> {
             if (stepSummary != null) {
                 this.mStepGoal.setText("" + stepSummary.getGoal());

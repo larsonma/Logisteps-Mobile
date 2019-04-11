@@ -1,6 +1,7 @@
 package com.example.mobilephone.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -184,11 +185,16 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void startMainIntent(String username, String password) {
-        finish();
+        SharedPreferences userSession = getSharedPreferences("userCredentials", MODE_PRIVATE);
+        SharedPreferences.Editor editor = userSession.edit();
+        editor.putString("username", username);
+        editor.putString("password", password);
+        editor.commit();
+
         Intent mainActivityIntent = new Intent(RegisterActivity.this, MainActivity.class);
-        mainActivityIntent.putExtra("username", username);
-        mainActivityIntent.putExtra("password", password);
         RegisterActivity.this.startActivity(mainActivityIntent);
+
+        finish();
     }
 
 }
