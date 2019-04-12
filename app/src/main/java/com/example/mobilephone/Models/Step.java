@@ -15,6 +15,12 @@ public final class Step {
         this.location = location;
     }
 
+    public Step(String time, List<SensorReading> sensorReadings, Location location) {
+        this.time = time;
+        this.sensorReadings = sensorReadings;
+        this.location = location;
+    }
+
     @SerializedName("datetime")
     private String time;
 
@@ -26,4 +32,8 @@ public final class Step {
 
     @SerializedName("location")
     private Location location;
+
+    public void setShoe(String shoe) {
+        this.shoe = shoe;
+    }
 }

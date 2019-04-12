@@ -15,4 +15,8 @@ public class SensorReading {
         this.location = location;
         this.pressure = pressure;
     }
+
+    public double getPressure() {
+        return pressure;
+    }
 }

@@ -86,9 +86,6 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 	// Flag to determine if the device is ready
 	private final MutableLiveData<Void> mOnDeviceReady = new MutableLiveData<>();
 
-	// Flag that holds the on off state of the LED. On is true, Off is False
-	private final MutableLiveData<Boolean> mLEDState = new MutableLiveData<>();
-
 	// Flag that holds the pressed released state of the button on the devkit.
 	// Pressed is true, Released is false
 	private final MutableLiveData<Integer> mButtonState = new MutableLiveData<>();
@@ -117,28 +114,12 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 //		}
 //	};
 
-	public LiveData<Void> isDeviceReady() {
-		return mOnDeviceReady;
-	}
-
-	public LiveData<String> getConnectionState() {
-		return mConnectionState;
-	}
-
 	public LiveData<Boolean> isConnected() {
 		return mIsConnected;
 	}
 
 	public LiveData<Integer> getButtonState() {
 		return mButtonState;
-	}
-
-	public LiveData<Boolean> getLEDState() {
-		return mLEDState;
-	}
-
-	public LiveData<Boolean> isSupported() {
-		return mIsSupported;
 	}
 
 	@Inject
@@ -152,9 +133,11 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		//Create step manager. Collects sensor readings and creates steps
         stepManager = new StepManager();
         stepManager.setOnStepCreatedEventListener(step -> {
+        	step.setShoe(shoe.getFoot());
             steps.add(step);
             if(steps.size() == 10) {
                 postSteps();
+                steps.clear();
             }
         });
 
@@ -222,7 +205,6 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
             );
 
             stepRepository.postSteps(steps, currentUser);
-            steps.clear();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
