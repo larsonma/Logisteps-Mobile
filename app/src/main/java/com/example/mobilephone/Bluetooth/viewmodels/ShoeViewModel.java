@@ -184,7 +184,7 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
 		if (mDevice != null) {
 			mLogistepsManager.connect(mDevice)
 					.retry(3, 100)
-					.useAutoConnect(false)
+					.useAutoConnect(true)
 					.enqueue();
 		}
 	}
