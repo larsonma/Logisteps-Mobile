@@ -21,6 +21,7 @@ public class StepManager {
 
     private long lastTopSensorUpdate;
     private long lastBottomSensorUpdate;
+    private StepState stepState;
 
     //TODO Should have some location manager
 
@@ -32,6 +33,7 @@ public class StepManager {
 
         lastTopSensorUpdate = 0;
         lastBottomSensorUpdate = 0;
+        stepState = StepState.IDLE;
     }
 
     public void setOnStepCreatedEventListener(OnStepCreatedEventListener eventListener) {
@@ -52,7 +54,7 @@ public class StepManager {
             }
         }
 
-        topSensorReadings.add(sensorReadings.get(0));
+        topSensorReadings.addAll(sensorReadings);
         lastTopSensorUpdate = now;
 
         onSensorDataReceived();
@@ -67,12 +69,12 @@ public class StepManager {
         if(bottomSensorReadings.size() > 0) {
 
             if (now - lastBottomSensorUpdate > TIME_THRESHOLD) {
-                //Need to reset the data. A potential step was not received
+                //Need to reset the data. A potential error occurred
                 bottomSensorReadings.clear();
             }
         }
 
-        bottomSensorReadings.add(sensorReadings.get(0));
+        bottomSensorReadings.addAll(sensorReadings);
         lastBottomSensorUpdate = now;
 
         onSensorDataReceived();
@@ -92,11 +94,25 @@ public class StepManager {
     }
 
     private void onSensorDataReceived() {
+        //TODO may need to add mutex protection
         if (topSensorReadings.size() >= STEP_EVENT_SIZE && bottomSensorReadings.size() >= STEP_EVENT_SIZE) {
 
-            //If both sensors have average pressure larger than the threshold, create a step
-            if (getAvgPressure(topSensorReadings) >= PRESSURE_THRESHOLD && getAvgPressure(bottomSensorReadings) >= PRESSURE_THRESHOLD) {
-                createStep();
+            // If both sensors have average pressure larger than the threshold and they occurred within a
+            // small enough interval of time, create a step
+            if (getAvgPressure(topSensorReadings) >= PRESSURE_THRESHOLD
+                    && getAvgPressure(bottomSensorReadings) >= PRESSURE_THRESHOLD
+                    && Math.abs(lastBottomSensorUpdate - lastTopSensorUpdate) < TIME_THRESHOLD
+            ) {
+                if (stepState != StepState.STEP_DOWN) {
+                    createStep();
+                }
+                stepState = StepState.STEP_DOWN;
+            } else {
+                if (stepState == StepState.STEP_DOWN) {
+                    stepState = StepState.STEP_UP;
+                } else if (stepState == StepState.STEP_UP) {
+                    stepState = StepState.IDLE;
+                }
             }
 
             topSensorReadings.clear();
