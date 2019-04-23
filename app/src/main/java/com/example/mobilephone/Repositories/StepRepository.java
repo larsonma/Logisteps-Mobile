@@ -32,9 +32,13 @@ public class StepRepository {
     public void postSteps(List<Step> steps, User user) {
         executor.execute(() -> {
             try {
-                Response<List<Step>> response = webservice.postSteps(Credentials.basic(user.getBaseUser().getUsername(), user.getBaseUser().getPassword()), steps).execute();
+                Response<List<Step>> response = webservice
+                        .postSteps(Credentials.basic(
+                            user.getBaseUser().getUsername(),
+                            user.getBaseUser().getPassword()),
+                            steps)
+                        .execute();
             } catch (IOException e) {
-                // TODO: check for errors
                 Log.e(TAG, e.toString());
             }
         });
