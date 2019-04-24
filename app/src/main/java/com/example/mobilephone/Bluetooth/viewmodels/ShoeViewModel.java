@@ -47,6 +47,7 @@ import com.example.mobilephone.Repositories.StepRepository;
 import com.example.mobilephone.Repositories.UserRepository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -135,7 +136,7 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
         stepManager.setOnStepCreatedEventListener(step -> {
         	step.setShoe(shoe.getFoot());
             steps.add(step);
-            if(steps.size() == 10) {
+            if(steps.size() >= 10) {
                 postSteps();
                 steps.clear();
             }
@@ -204,7 +205,10 @@ public class ShoeViewModel extends AndroidViewModel implements LogistepsManagerC
                     sharedPreferences.getString("password", "")
             );
 
-            stepRepository.postSteps(steps, currentUser);
+            ArrayList<Step> temp = new ArrayList<>();
+            temp.addAll(steps);
+
+            stepRepository.postSteps(temp, currentUser);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {

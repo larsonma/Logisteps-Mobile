@@ -24,7 +24,7 @@ public abstract class LogistepsSensorDataCallback implements ProfileDataCallback
         ArrayList<Integer> sensorReadings = new ArrayList<>();
 
         for (int i = 0; i < SENSOR_READINGS; i++) {
-            sensorReadings.add(data.getIntValue(Data.FORMAT_SINT8, i));
+            sensorReadings.add(data.getIntValue(Data.FORMAT_UINT8, i));
         }
         onSensorDataRecieved(device, sensorReadings);
     }
